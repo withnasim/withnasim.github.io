@@ -1,507 +1,511 @@
-<!DOCTYPE html>
-<html>
-
+<!doctype html>
+<html lang="en">
 <head>
-  <!-- Basic -->
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <meta name="author" content="" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naj Studio – Cozy puzzle games for everyone</title>
+<meta name="description" content="Naj Studio makes small, beautiful, easy-to-learn puzzle games for Android: Brickwise block puzzle, Potion Pour color sort and Peep, your little talking chick.">
+<meta name="theme-color" content="#140F3D">
+<link rel="canonical" href="https://withnasim.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Naj Studio – Cozy puzzle games for everyone">
+<meta property="og:description" content="Small, beautiful puzzle games you can play anywhere. Get Brickwise and Potion Pour on Google Play.">
+<meta property="og:image" content="https://withnasim.github.io/assets/games/brickwise-feature.jpg">
+<meta property="og:url" content="https://withnasim.github.io/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Naj Studio",
+  "url": "https://withnasim.github.io/",
+  "email": "info.nasimreza@gmail.com",
+  "logo": "https://withnasim.github.io/assets/favicon.svg"
+}
+</script>
+<style>
+  :root {
+    --bg: #100C30;
+    --bg-2: #18124A;
+    --surface: rgba(255, 255, 255, 0.06);
+    --surface-2: rgba(255, 255, 255, 0.1);
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #F5F2FF;
+    --text-dim: #B9B2E3;
+    --gold: #FFC93C;
+    --gold-deep: #F29E1F;
+    --pink: #FF5A7E;
+    --orange: #FF8A3D;
+    --teal: #3CE0C0;
+    --blue: #4F7BFF;
+    --violet: #A66BFF;
+    --radius: 28px;
+    --shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.55);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; }
+  h1, h2, h3 { font-family: "Fredoka", sans-serif; line-height: 1.08; margin: 0; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  .wrap { width: min(1160px, 100% - 40px); margin-inline: auto; }
+  .gold {
+    background: linear-gradient(180deg, #FFF0B3, var(--gold) 55%, var(--gold-deep));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 8px; }
 
-  <title>Nasim Reza - Digital Marketing Expert </title>
+  /* ---------- background glow ---------- */
+  .glow { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .glow::before, .glow::after {
+    content: ""; position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.55;
+  }
+  .glow::before { width: 900px; height: 900px; top: -420px; left: -200px; background: radial-gradient(circle, #6A3DF0, transparent 65%); }
+  .glow::after { width: 800px; height: 800px; bottom: -420px; right: -260px; background: radial-gradient(circle, #1FB6A6, transparent 65%); opacity: 0.35; }
 
-  <!-- slider stylesheet -->
-  <link rel="stylesheet" type="text/css"
-    href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
+  /* ---------- gem block (same look as the games) ---------- */
+  .gem {
+    --c1: #FF9AAA; --c2: #FF5A6E; --c3: #C22C47;
+    position: relative; display: block; flex: none; width: var(--s, 40px); height: var(--s, 40px); border-radius: calc(var(--s, 40px) * 0.22);
+    background: linear-gradient(180deg, var(--c1), var(--c2) 50%, var(--c3));
+    box-shadow: 0 calc(var(--s, 40px) * 0.08) 0 rgba(0, 0, 0, 0.28), 0 14px 26px -10px rgba(0, 0, 0, 0.5);
+  }
+  .gem::before {
+    content: ""; position: absolute; inset: 13%; border-radius: calc(var(--s, 40px) * 0.12);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 60%);
+  }
+  .gem::after {
+    content: ""; position: absolute; left: 20%; top: 17%; width: 36%; height: 11%; border-radius: 99px;
+    background: rgba(255, 255, 255, 0.55);
+  }
+  .g-red { --c1: #FF9AAA; --c2: #FF5A6E; --c3: #C22C47; }
+  .g-yellow { --c1: #FFEC99; --c2: #FFD23F; --c3: #C79A0C; }
+  .g-cyan { --c1: #97ECFB; --c2: #3CD2F0; --c3: #138FB2; }
+  .g-purple { --c1: #D9AEFF; --c2: #B266FF; --c3: #7633D0; }
+  .g-green { --c1: #9AF3B8; --c2: #4CD97B; --c3: #1F9C4B; }
+  .g-blue { --c1: #9AB2FF; --c2: #4F7BFF; --c3: #2647C9; }
+  .g-orange { --c1: #FFC789; --c2: #FF9A3C; --c3: #CC6410; }
 
+  /* ---------- nav ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    background: rgba(16, 12, 48, 0.72); border-bottom: 1px solid var(--line);
+  }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-family: "Fredoka"; font-weight: 700; font-size: 22px; }
+  .mark { display: grid; grid-template-columns: repeat(2, 15px); gap: 3px; }
+  .mark .gem { --s: 15px; }
+  .nav nav { display: flex; align-items: center; gap: 28px; }
+  .nav nav a { text-decoration: none; color: var(--text-dim); font-weight: 700; font-size: 15px; transition: color .2s; }
+  .nav nav a:hover { color: var(--text); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; border: 0;
+    font-family: "Fredoka"; font-weight: 600; font-size: 17px; color: #fff;
+    padding: 14px 26px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--orange), var(--pink));
+    box-shadow: 0 14px 30px -12px rgba(255, 77, 122, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -12px rgba(255, 77, 122, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+  .btn.ghost { background: var(--surface-2); box-shadow: inset 0 0 0 1.5px var(--line); }
+  .nav .btn, .nav nav a.btn { padding: 10px 20px; font-size: 15px; color: #fff; }
 
-  <!-- font wesome stylesheet -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  /* ---------- hero ---------- */
+  .hero { position: relative; padding: 84px 0 110px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line); color: var(--text-dim); font-weight: 700; font-size: 14px;
+  }
+  .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 12px var(--teal); }
+  .hero h1 { font-size: clamp(44px, 6.4vw, 78px); margin: 22px 0 22px; font-weight: 700; }
+  .hero p.lead { font-size: 20px; color: var(--text-dim); max-width: 520px; }
+  .hero .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+  .hero .stats { display: flex; gap: 34px; margin-top: 44px; flex-wrap: wrap; }
+  .stat b { display: block; font-family: "Fredoka"; font-size: 30px; }
+  .stat span { color: var(--text-dim); font-size: 14px; font-weight: 600; }
 
-  <!-- bootstrap core css -->
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  .stage { position: relative; height: 560px; }
+  .phone {
+    position: absolute; width: 230px; aspect-ratio: 1 / 2; border-radius: 34px; padding: 9px;
+    background: linear-gradient(160deg, #3a3560, #12102a 45%, #0a0918);
+    box-shadow: var(--shadow), 0 0 0 1.5px rgba(255, 255, 255, 0.08);
+  }
+  .phone img { width: 100%; height: 100%; object-fit: cover; border-radius: 26px; }
+  .stage .p1 { left: 4%; top: 70px; transform: rotate(-9deg); z-index: 1; }
+  .stage .p2 { left: 32%; top: 0; z-index: 3; width: 250px; }
+  .stage .p3 { right: 0; top: 80px; transform: rotate(9deg); z-index: 2; }
+  .float { position: absolute; z-index: 4; animation: bob 6s ease-in-out infinite; }
+  .float.f1 { left: -4%; top: 20px; --s: 54px; animation-delay: -1s; }
+  .float.f2 { right: 6%; top: -10px; --s: 40px; animation-delay: -3s; }
+  .float.f3 { left: 18%; bottom: 10px; --s: 46px; animation-delay: -2s; }
+  .float.f4 { right: -2%; bottom: 60px; --s: 58px; animation-delay: -4s; }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-16px) rotate(6deg); } }
 
-  <!-- fonts style -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
-  <!-- Custom styles for this template -->
-  <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
-  <link href="css/responsive.css" rel="stylesheet" />
+  /* ---------- sections ---------- */
+  section { padding: 96px 0; }
+  .section-head { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+  .section-head h2 { font-size: clamp(34px, 4.4vw, 52px); }
+  .section-head p { color: var(--text-dim); font-size: 18px; margin-top: 14px; }
+  .kicker { font-family: "Fredoka"; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; font-size: 13px; color: var(--gold); margin-bottom: 12px; display: block; }
+
+  /* ---------- game cards ---------- */
+  .game {
+    --accent: var(--violet);
+    position: relative; display: grid; grid-template-columns: 1fr 1.05fr; gap: 48px; align-items: center;
+    padding: 48px; border-radius: 40px; margin-bottom: 36px; overflow: hidden;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 22%, transparent), rgba(255, 255, 255, 0.03) 60%);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .game::before {
+    content: ""; position: absolute; width: 520px; height: 520px; border-radius: 50%; right: -160px; top: -180px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 45%, transparent), transparent 65%);
+    filter: blur(40px); opacity: .6; pointer-events: none;
+  }
+  .game.flip { grid-template-columns: 1.05fr 1fr; }
+  .game.flip .info { order: 2; }
+  .game .info { position: relative; }
+  .game .title { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  .game .icon { width: 84px; height: 84px; border-radius: 22px; box-shadow: 0 14px 30px -10px rgba(0, 0, 0, .6); }
+  .game h3 { font-size: clamp(30px, 3.4vw, 42px); }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; color: var(--text-dim); margin-top: 4px; }
+  .game p.desc { color: var(--text-dim); font-size: 17.5px; margin-bottom: 22px; }
+  .game ul { list-style: none; padding: 0; margin: 0 0 30px; display: grid; gap: 12px; }
+  .game li { display: flex; gap: 12px; align-items: flex-start; font-weight: 600; }
+  .game li::before {
+    content: ""; flex: none; width: 18px; height: 18px; margin-top: 4px; border-radius: 6px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 55%, white), var(--accent));
+    box-shadow: 0 3px 0 rgba(0, 0, 0, .25);
+  }
+  .cta-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .play-badge img { height: 62px; width: auto; margin: -9px; }
+  .play-badge { display: inline-block; border-radius: 12px; transition: transform .2s; }
+  .play-badge:hover { transform: translateY(-2px); }
+  .small-link { color: var(--text-dim); font-size: 14px; font-weight: 600; text-underline-offset: 3px; }
+  .small-link:hover { color: var(--text); }
+  .shots { position: relative; display: flex; justify-content: center; gap: 18px; }
+  .shots .phone { position: relative; width: 31%; max-width: 190px; }
+  .shots .phone:nth-child(2) { transform: translateY(-26px); }
+  .soon {
+    position: absolute; top: 22px; right: 22px; z-index: 2; padding: 8px 16px; border-radius: 999px;
+    font-family: "Fredoka"; font-weight: 600; font-size: 14px; color: #3A2500;
+    background: linear-gradient(180deg, #FFE27A, var(--gold));
+  }
+
+  /* ---------- values ---------- */
+  .values { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .value {
+    padding: 30px 26px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line);
+    transition: transform .25s, background .25s;
+  }
+  .value:hover { transform: translateY(-4px); background: var(--surface-2); }
+  .value .gem { --s: 44px; margin-bottom: 22px; }
+  .value h3 { font-size: 22px; margin-bottom: 8px; }
+  .value p { color: var(--text-dim); font-size: 15.5px; }
+
+  /* ---------- contact ---------- */
+  .contact {
+    text-align: center; padding: 72px 32px; border-radius: 40px; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 138, 61, .22), rgba(255, 90, 126, .16) 40%, rgba(106, 61, 240, .25));
+    border: 1px solid var(--line);
+  }
+  .contact h2 { font-size: clamp(32px, 4.2vw, 50px); margin-bottom: 14px; }
+  .contact p { color: var(--text-dim); font-size: 18px; max-width: 560px; margin: 0 auto 30px; }
+  .contact .row { position: absolute; display: flex; gap: 8px; opacity: .9; }
+  .contact .row .gem { --s: 30px; }
+  .contact .r1 { left: 34px; top: 34px; transform: rotate(-12deg); }
+  .contact .r2 { right: 34px; bottom: 34px; transform: rotate(10deg); }
+
+  /* ---------- footer ---------- */
+  footer { padding: 46px 0 56px; border-top: 1px solid var(--line); margin-top: 40px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: center; }
+  footer .links { display: flex; gap: 22px; flex-wrap: wrap; }
+  footer a { color: var(--text-dim); text-decoration: none; font-size: 14px; font-weight: 600; }
+  footer a:hover { color: var(--text); }
+  footer small { color: var(--text-dim); font-size: 14px; }
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s cubic-bezier(.16, 1, .3, 1), transform .8s cubic-bezier(.16, 1, .3, 1); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .float { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 980px) {
+    .hero .wrap { grid-template-columns: 1fr; text-align: center; }
+    .hero p.lead { margin-inline: auto; }
+    .hero .actions, .hero .stats { justify-content: center; }
+    .stage { height: 480px; max-width: 560px; margin: 10px auto 0; width: 100%; }
+    .game, .game.flip { grid-template-columns: 1fr; padding: 36px 28px; gap: 36px; }
+    .game.flip .info { order: 0; }
+    .values { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .nav nav a:not(.btn) { display: none; }
+    .hero { padding: 52px 0 70px; }
+    .hero p.lead { font-size: 18px; }
+    .stage { height: 380px; }
+    .phone { width: 160px; border-radius: 26px; padding: 7px; }
+    .phone img { border-radius: 20px; }
+    .stage .p2 { width: 175px; left: calc(50% - 87px); }
+    .stage .p1 { left: 0; top: 60px; }
+    .stage .p3 { right: 0; top: 60px; }
+    section { padding: 70px 0; }
+    .game { padding: 28px 20px; border-radius: 30px; }
+    .game .icon { width: 68px; height: 68px; border-radius: 18px; }
+    .shots { gap: 10px; }
+    .values { grid-template-columns: 1fr; }
+    .contact { padding: 56px 22px; }
+    .contact .row { display: none; }
+    footer .wrap { flex-direction: column; text-align: center; }
+    footer .links { justify-content: center; }
+  }
+</style>
 </head>
-
 <body>
-  <div class="hero_area">
-    <!-- header section strats -->
-    <header class="header_section">
-      <div class="container">
-        <nav class="navbar navbar-expand-lg custom_nav-container pt-3">
-          <a class="navbar-brand mr-5" href="index.html">
-            <img src="images/logo.png" alt="">
-            <span>
-              Fregg
-            </span>
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
-              <ul class="navbar-nav  ">
-                <li class="nav-item active">
-                  <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="about.html"> About </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="service.html"> Service </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="contact.html">Contact us</a>
-                </li>
-              </ul>
-              <form class="form-inline">
-                <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>
-              </form>
-            </div>
-          </div>
-        </nav>
-      </div>
-    </header>
-    <!-- end header section -->
-    <!-- slider section -->
-    <section class=" slider_section position-relative">
-      <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-        <ol class="carousel-indicators">
-          <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active">01</li>
-          <li data-target="#carouselExampleIndicators" data-slide-to="1">02</li>
-        </ol>
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="container">
-              <div class="row">
-                <div class="col-md-7">
-                  <div class="detail-box">
-                    <div>
-                      <h1>
-                        Welcome To <br>
-                        <span>
-                          Content Writing Services
-                        </span>
-                      </h1>
-                      <p>
-                        It is a long established fact that a reader will be distracted by the readable content of a page
-                        when looking
-                      </p>
-                      <div class="btn-box">
-                        <a href="" class="btn-1">
-                          Contact Us
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="container">
-              <div class="row">
-                <div class="col-md-7">
-                  <div class="detail-box">
-                    <div>
-                      <h1>
-                        Welcome To <br>
-                        <span>
-                          Content Writing Services
-                        </span>
-                      </h1>
-                      <p>
-                        It is a long established fact that a reader will be distracted by the readable content of a page
-                        when looking
-                      </p>
-                      <div class="btn-box">
-                        <a href="" class="btn-1">
-                          Contact Us
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="custom_carousel-control">
-          <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
-      </div>
-    </section>
-    <!-- end slider section -->
+<div class="glow" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Naj Studio home">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Naj Studio
+    </a>
+    <nav aria-label="Main">
+      <a href="#games">Games</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a class="btn" href="#games">Play now</a>
+    </nav>
   </div>
+</header>
 
-  <!-- about section -->
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow reveal"><span class="dot"></span> Indie mobile games · Made with care</span>
+        <h1 class="reveal">Cozy puzzle games<br>for <span class="gold">everyone</span></h1>
+        <p class="lead reveal">Naj Studio makes small, beautiful games that are easy to learn and hard to put down. Relax, train your brain, and play anywhere.</p>
+        <div class="actions reveal">
+          <a class="btn" href="#games">Explore our games</a>
+          <a class="btn ghost" href="#contact">Get in touch</a>
+        </div>
+        <div class="stats reveal">
+          <div class="stat"><b>2</b><span>games on Google Play</span></div>
+          <div class="stat"><b>1</b><span>more coming soon</span></div>
+          <div class="stat"><b>Free</b><span>to download</span></div>
+        </div>
+      </div>
 
-  <section class="about_section layout_padding">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="detail-box">
-            <div class="heading_container">
-              <h2>
-                About Us
-              </h2>
+      <div class="stage reveal" aria-hidden="true">
+        <div class="phone p1"><img src="assets/games/potionpour-shot1.jpg" alt=""></div>
+        <div class="phone p2"><img src="assets/games/brickwise-shot2.jpg" alt=""></div>
+        <div class="phone p3"><img src="assets/games/peep-shot1.jpg" alt=""></div>
+        <span class="gem g-yellow float f1"></span>
+        <span class="gem g-cyan float f2"></span>
+        <span class="gem g-purple float f3"></span>
+        <span class="gem g-red float f4"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAMES -->
+  <section id="games">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Our games</span>
+        <h2>Pick a puzzle, find your calm</h2>
+        <p>Every game is designed to feel great in your hands: satisfying sounds, smooth animations and gentle difficulty that grows with you.</p>
+      </div>
+
+      <!-- Brickwise -->
+      <article class="game reveal" style="--accent:#7C4DFF">
+        <div class="info">
+          <div class="title">
+            <img class="icon" src="assets/games/brickwise-icon.png" alt="Brickwise app icon" width="84" height="84">
+            <div>
+              <h3>Brickwise</h3>
+              <span class="tag">Block Puzzle</span>
             </div>
-            <p>
-              It is a long established fact that a reader will be distracted by the readable content of a page when
-              looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of
-              letters, as opposed to using 'Content here, content here', making it look like readable English. Many
-              desktop publishing packages and web page editors now use Lorem Ipsum as their
-            </p>
-            <a href="">
-              Get Started
+          </div>
+          <p class="desc">A calm yet addictive block puzzle. Drag glossy blocks onto the board, clear rows and columns, and chain huge combos.</p>
+          <ul>
+            <li>Drag blocks onto the 8×8 board and fill full lines to clear them</li>
+            <li>Combo streaks, multi-line bonuses and Perfect Clears</li>
+            <li>Saves automatically, so you can continue any time</li>
+          </ul>
+          <div class="cta-row">
+            <a class="play-badge" href="https://play.google.com/store/apps/details?id=com.najstudio.brickwise" target="_blank" rel="noopener">
+              <img src="assets/google-play-badge.png" alt="Get Brickwise on Google Play" width="161" height="62">
             </a>
+            <a class="small-link" href="brickwise-privacy/privacy-policy.html">Privacy policy</a>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="img-box">
-            <img src="images/about-img.png" alt="">
+        <div class="shots">
+          <div class="phone"><img src="assets/games/brickwise-shot1.jpg" alt="Brickwise home screen" loading="lazy"></div>
+          <div class="phone"><img src="assets/games/brickwise-shot2.jpg" alt="Brickwise combo on the board" loading="lazy"></div>
+          <div class="phone"><img src="assets/games/brickwise-shot3.jpg" alt="Brickwise gameplay" loading="lazy"></div>
+        </div>
+      </article>
+
+      <!-- Potion Pour -->
+      <article class="game flip reveal" style="--accent:#14B8A6">
+        <div class="info">
+          <div class="title">
+            <img class="icon" src="assets/games/potionpour-icon.png" alt="Potion Pour app icon" width="84" height="84">
+            <div>
+              <h3>Potion Pour</h3>
+              <span class="tag">Color Sort Puzzle</span>
+            </div>
           </div>
+          <p class="desc">Pour glowing potions from flask to flask until every flask holds a single color, then watch it get corked with a sparkle.</p>
+          <ul>
+            <li>Endless levels, from easy to truly brain-bending</li>
+            <li>A new Daily Potion every day. Build your streak!</li>
+            <li>Magical scenes, color-blind friendly symbols, undo and hints</li>
+          </ul>
+          <div class="cta-row">
+            <a class="play-badge" href="https://play.google.com/store/apps/details?id=com.najstudio.potionpour" target="_blank" rel="noopener">
+              <img src="assets/google-play-badge.png" alt="Get Potion Pour on Google Play" width="161" height="62">
+            </a>
+            <a class="small-link" href="potionpour-privacy/">Privacy policy</a>
+          </div>
+        </div>
+        <div class="shots">
+          <div class="phone"><img src="assets/games/potionpour-shot1.jpg" alt="Pouring potions in Potion Pour" loading="lazy"></div>
+          <div class="phone"><img src="assets/games/potionpour-shot2.jpg" alt="Potion Pour level complete" loading="lazy"></div>
+          <div class="phone"><img src="assets/games/potionpour-shot3.jpg" alt="Potion Pour magical scenes" loading="lazy"></div>
+        </div>
+      </article>
+
+      <!-- Peep -->
+      <article class="game reveal" style="--accent:#F5A524">
+        <span class="soon">Coming soon</span>
+        <div class="info">
+          <div class="title">
+            <img class="icon" src="assets/games/peep-icon.png" alt="Peep app icon" width="84" height="84">
+            <div>
+              <h3>Peep</h3>
+              <span class="tag">My Little Talking Chick</span>
+            </div>
+          </div>
+          <p class="desc">Talk, feed, dress up and dance with Peep, your cute little talking baby chick. Bath time, disco parties, trips to space and snowy adventures await!</p>
+          <ul>
+            <li>Peep repeats what you say in a funny little voice</li>
+            <li>Dress-up, bath time, disco dancing and more</li>
+            <li>Visit colorful places, from space to snowland</li>
+          </ul>
+          <div class="cta-row">
+            <span class="btn ghost" aria-disabled="true">Coming soon to Google Play</span>
+          </div>
+        </div>
+        <div class="shots">
+          <div class="phone"><img src="assets/games/peep-shot1.jpg" alt="Peep says hello" loading="lazy"></div>
+          <div class="phone"><img src="assets/games/peep-shot2.jpg" alt="Dressing up Peep" loading="lazy"></div>
+          <div class="phone"><img src="assets/games/peep-shot3.jpg" alt="Peep at the disco" loading="lazy"></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ABOUT / VALUES -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Why players love them</span>
+        <h2>Small games, big smiles</h2>
+        <p>We're a small independent studio. We build games we'd want to play ourselves: simple to start, beautiful to look at and respectful of your time.</p>
+      </div>
+      <div class="values">
+        <div class="value reveal">
+          <span class="gem g-yellow"></span>
+          <h3>Easy to learn</h3>
+          <p>Understand every game in seconds. Mastering it is the fun part.</p>
+        </div>
+        <div class="value reveal">
+          <span class="gem g-cyan"></span>
+          <h3>Play offline</h3>
+          <p>No Wi-Fi? No problem. Play on the bus, on a plane or anywhere.</p>
+        </div>
+        <div class="value reveal">
+          <span class="gem g-green"></span>
+          <h3>Tiny downloads</h3>
+          <p>Small file sizes that run smoothly, even on older phones.</p>
+        </div>
+        <div class="value reveal">
+          <span class="gem g-purple"></span>
+          <h3>No accounts</h3>
+          <p>Just open the game and play. Your progress saves on your device.</p>
         </div>
       </div>
     </div>
   </section>
-  <!-- end about section -->
-  <div class="body_bg layout_padding">
 
-    <!-- service section -->
-
-    <section class="service_section ">
-      <div class="container">
-        <div class="heading_container">
-          <h2>
-            At Your Service
-          </h2>
-        </div>
-      </div>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="box">
-              <div class="img-box">
-                <img src="images/s-1.png" alt="">
-              </div>
-              <h4>
-                Written with Love
-              </h4>
-              <p>
-                It is a long established fact that a reader will be distracted by the readable content of a page when
-                looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution
-                of
-                letters, as opposed to using 'Content here, content t,
-              </p>
-              <a href="">
-                Read More
-              </a>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="box align-items-end align-items-md-start text-right text-md-left">
-              <div class="img-box">
-                <img src="images/s-2.png" alt="">
-              </div>
-              <h4>
-                Fast Turnaround
-              </h4>
-              <p>
-                It is a long established fact that a reader will be distracted by the readable content of a page when
-                looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution
-                of
-                letters, as opposed to using 'Content here, content here', making it look like
-              </p>
-              <a href="">
-                Read More
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="box">
-              <div class="img-box">
-                <img src="images/s-3.png" alt="">
-              </div>
-              <h4>
-                Up to Date
-              </h4>
-              <p>
-                It is a long established fact that a reader will be distracted by the readable content of a page when
-                looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution
-                of
-                letters, as opposed to using 'Content here, content here', making it look like now use Lorem Ipsum as
-                their default model text,
-              </p>
-              <a href="">
-                Read More
-              </a>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="box align-items-end align-items-md-start text-right text-md-left">
-              <div class="img-box">
-                <img src="images/s-4.png" alt="">
-              </div>
-              <h4>
-                Premium Content
-              </h4>
-              <p>
-                It is a long established fact that a reader will be distracted by the readable content of a page when
-                looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution
-                of
-                letters, as opposed to using 'Content here, content here', making it look like
-              </p>
-              <a href="">
-                Read More
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- end service section -->
-
-    <!-- quote section -->
-
-    <section class="quote_section layout_padding">
-      <div class="container">
-        <div class="box">
-          <div class="detail-box">
-            <h3>
-              Get Your Quote Today!
-            </h3>
-            <p>
-              It is a long established fact that a reader will be distracted by the readable content of a page
-            </p>
-          </div>
-          <div class="btn-box">
-            <a href="">
-              Get A Quote
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- end quote section -->
-
-
-    <!-- contact section -->
-
-    <section class="contact_section">
-      <div class="container">
-        <div class="heading_container">
-          <h2>
-            Let's Get In Touch!
-          </h2>
-        </div>
-      </div>
-      <div class="container contact_bg layout_padding2-top">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="contact_form ">
-              <form action="">
-                <input type="text" placeholder="Name ">
-                <input type="email" placeholder="Email">
-                <input type="text" placeholder="Message" class="message_input">
-                <button>
-                  Send
-                </button>
-              </form>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="img-box">
-              <img src="images/contact-img.jpg" alt="">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- end contact section -->
-
-    <!-- client section -->
-
-    <section class="client_section layout_padding-top">
-      <div class="d-flex justify-content-center">
-        <div class="heading_container">
-          <h2>
-            Testimonial
-          </h2>
-        </div>
-      </div>
-      <div class="container layout_padding2">
-        <div id="carouselExample2Indicators" class="carousel slide" data-ride="carousel">
-          <ol class="carousel-indicators">
-            <li data-target="#carouselExample2Indicators" data-slide-to="0" class="active"></li>
-            <li data-target="#carouselExample2Indicators" data-slide-to="1"></li>
-            <li data-target="#carouselExample2Indicators" data-slide-to="2"></li>
-          </ol>
-          <div class="carousel-inner">
-            <div class="carousel-item ">
-              <div class="client_container">
-                <div class="client-id">
-                  <div class="img-box">
-                    <img src="images/client.jpg" alt="">
-                  </div>
-                  <div class="client_name">
-                    <div>
-                      <h3>
-                        Johndue
-                      </h3>
-                      <p>
-                        Farm & CO
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="client_detail">
-                  <div class="client_text">
-                    <blockquote>
-                      <p>
-                        ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                        dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                        aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="carousel-item active">
-              <div class="client_container">
-                <div class="client-id">
-                  <div class="img-box">
-                    <img src="images/client.jpg" alt="">
-                  </div>
-                  <div class="client_name">
-                    <div>
-                      <h3>
-                        Johndue
-                      </h3>
-                      <p>
-                        Farm & CO
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="client_detail">
-                  <div class="client_text">
-                    <blockquote>
-                      <p>
-                        ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                        dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                        aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="carousel-item ">
-              <div class="client_container">
-                <div class="client-id">
-                  <div class="img-box">
-                    <img src="images/client.jpg" alt="">
-                  </div>
-                  <div class="client_name">
-                    <div>
-                      <h3>
-                        Johndue
-                      </h3>
-                      <p>
-                        Farm & CO
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="client_detail">
-                  <div class="client_text">
-                    <blockquote>
-                      <p>
-                        ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                        dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                        aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- end client section -->
-
-  </div>
-  <!-- info section -->
-
-  <section class="info_section layout_padding">
-    <div class="footer_contact">
-      <div class="heading_container">
-        <h2>
-          Contact Us
-        </h2>
-      </div>
-      <div class="box">
-        <a href="" class="img-box">
-          <img src="images/location.png" alt="" class="img-1">
-          <img src="images/location-o.png" alt="" class="img-2">
-        </a>
-        <a href="" class="img-box">
-          <img src="images/call.png" alt="" class="img-1">
-          <img src="images/call-o.png" alt="" class="img-2">
-        </a>
-        <a href="" class="img-box">
-          <img src="images/envelope.png" alt="" class="img-1">
-          <img src="images/envelope-o.png" alt="" class="img-2">
-        </a>
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact reveal">
+        <div class="row r1" aria-hidden="true"><span class="gem g-red"></span><span class="gem g-orange"></span><span class="gem g-yellow"></span></div>
+        <div class="row r2" aria-hidden="true"><span class="gem g-blue"></span><span class="gem g-purple"></span></div>
+        <span class="kicker">Say hello</span>
+        <h2>Ideas, feedback or found a bug?</h2>
+        <p>We read every message. Tell us what you love, what you'd change, or what game you'd like us to make next.</p>
+        <a class="btn" href="mailto:info.nasimreza@gmail.com">info.nasimreza@gmail.com</a>
       </div>
     </div>
-
-
   </section>
+</main>
 
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Naj Studio
+    </a>
+    <div class="links">
+      <a href="brickwise-privacy/privacy-policy.html">Brickwise privacy</a>
+      <a href="potionpour-privacy/">Potion Pour privacy</a>
+      <a href="peep-privacy/">Peep privacy</a>
+      <a href="mailto:info.nasimreza@gmail.com">Contact</a>
+    </div>
+    <small>© <span id="year">2026</span> Naj Studio. Google Play and the Google Play logo are trademarks of Google LLC.</small>
+  </div>
+</footer>
 
-  <!-- end info section -->
-
-  <!-- footer section -->
-  <section class="container-fluid footer_section">
-    <p>
-      Copyright &copy; 2019 All Rights Reserved By
-      <a href="https://www.nasimreza.com/">Nasim Reza</a>
-    </p>
-  </section>
-  <!-- footer section -->
-
-  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.js"></script>
-
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.12 }) : null;
+  document.querySelectorAll(".reveal").forEach((el, i) => {
+    el.style.transitionDelay = (i % 4) * 70 + "ms";
+    io ? io.observe(el) : el.classList.add("in");
+  });
+</script>
 </body>
-
 </html>

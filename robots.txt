@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://najura.com/sitemap.xml
+Sitemap: https://games.najura.com/sitemap.xml
+Sitemap: https://blog.najura.com/sitemap.xml
+Sitemap: https://app.najura.com/sitemap.xml

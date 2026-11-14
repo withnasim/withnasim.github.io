@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  var d = document.documentElement;
+  d.classList.add('js');
+  var stored = null;
+  try { stored = localStorage.getItem('najura-theme'); } catch(e){}
+  var theme = stored || 'dark';
+  d.setAttribute('data-theme', theme);
+  d.style.colorScheme = theme;
+})();
+</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWRCGHG');</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guides — puzzle technique from the Najura studio</title>
+<meta name="description" content="Puzzle technique notes from the Najura studio: block puzzle strategy, colour sort logic, memory training and studio notes.">
+<meta name="theme-color" content="#140F3D">
+<link rel="canonical" href="https://najura.com/guides/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Guides — puzzle technique from the Najura studio">
+<meta property="og:description" content="Puzzle technique notes from the Najura studio: block puzzle strategy, colour sort logic, memory training and studio notes.">
+<meta property="og:url" content="https://najura.com/guides/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/najura.css">
+
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Najura home">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura
+    </a>
+    <nav aria-label="Main">
+      <a href="https://games.najura.com/">Games</a>
+      <a href="/guides/">Guides</a>
+      <a href="https://app.najura.com/">Apps</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<article class="prose">
+<h1>Guides</h1>
+<p>Technique notes from the studio. We write these because most puzzle advice online is either a video with no explanation or a list of cheats that stop working at level twenty.</p>
+
+<div class="hub">
+  <h2><a href="/guides/block-puzzle-strategy/">How block puzzles actually work</a></h2>
+  <p>The three shapes that decide a run, why the score climbs late, and the board check that takes three seconds. Written for Brickwise players, useful in any block puzzle.</p>
+</div>
+
+<div class="hub">
+  <h2><a href="/guides/colour-sort-puzzles/">Colour sort puzzles: solving without hints</a></h2>
+  <p>The rule of the empty tube, why legal pours kill boards, and how to read a stuck level backwards. Written for Potion Pour players.</p>
+</div>
+
+<h2>Coming next</h2>
+<p>Memory games and spaced repetition, why Peep is offline and free, designing a puzzle for a five minute break, and what publishing an Android game from a small studio actually takes. One a week.</p>
+</article>
+</main>
+<footer>
+  <div class="wrap">
+    <a class="brand" href="/">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura
+    </a>
+    <div class="links">
+      <a href="https://games.najura.com/">Games</a>
+      <a href="/guides/">Guides</a>
+      <a href="https://app.najura.com/">Apps</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+    </div>
+    <div class="links">
+      <a href="/brickwise-privacy/privacy-policy.html">Brickwise privacy</a>
+      <a href="/potionpour-privacy/">Potion Pour privacy</a>
+      <a href="/peep-privacy/">Peep privacy</a>
+      <a href="/gilded-privacy/">Gilded privacy</a>
+    </div>
+    <small>&copy; <span id="year">2026</span> Najura, a brand of Najuvia LLC. Google Play and the Google Play logo are trademarks of Google LLC.</small>
+  </div>
+</footer>
+<script>
+(function(){
+  if (window.__najuraThemeBound) return;
+  window.__najuraThemeBound = true;
+  function paint(btn){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var label = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+  function setTheme(next){
+    document.documentElement.setAttribute('data-theme', next);
+    document.documentElement.style.colorScheme = next;
+    try { localStorage.setItem('najura-theme', next); } catch(e){}
+    Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), paint);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function(btn){
+    paint(btn);
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  var d = document.documentElement;
+  d.classList.add('js');
+  var stored = null;
+  try { stored = localStorage.getItem('najura-theme'); } catch(e){}
+  var theme = stored || 'dark';
+  d.setAttribute('data-theme', theme);
+  d.style.colorScheme = theme;
+})();
+</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWRCGHG');</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour sort puzzles: how to solve Potion Pour without hints</title>
+<meta name="description" content="The rule of the empty tube, why legal pours kill boards, and how to read a stuck colour sort level backwards.">
+<meta name="theme-color" content="#140F3D">
+<link rel="canonical" href="https://najura.com/guides/colour-sort-puzzles/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Colour sort puzzles: how to solve Potion Pour without hints">
+<meta property="og:description" content="The rule of the empty tube, why legal pours kill boards, and how to read a stuck colour sort level backwards.">
+<meta property="og:url" content="https://najura.com/guides/colour-sort-puzzles/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/najura.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Colour sort puzzles: how to solve Potion Pour without hints","author":{"@type":"Organization","name":"Najura"},"publisher":{"@type":"Organization","name":"Najura"},"datePublished":"14 November 2026"}
+</script>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Najura home">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura
+    </a>
+    <nav aria-label="Main">
+      <a href="https://games.najura.com/">Games</a>
+      <a href="/guides/">Guides</a>
+      <a href="https://app.najura.com/">Apps</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<article class="prose">
+<p class="meta"><a href="/guides/">Guides</a> &middot; Colour sort</p>
+<h1>Colour sort puzzles: how to solve Potion Pour without hints</h1>
+
+<p>A colour sort puzzle looks trivial: coloured liquid in tubes, pour one tube into another, sort the colours. Then you reach level forty and discover your board cannot be solved, in a way that feels like the game cheated. It did not. Colour sorting has a small set of rules, and most stuck positions come from breaking one of three of them.</p>
+
+<h2>The rule of the empty tube</h2>
+<p>An empty tube is not storage. It is a working hand. The moment you pour a colour into an empty tube that was not part of your plan, you have spent your only scratch space and the rest of the board is frozen.</p>
+<p>Strong players keep one tube empty for as long as possible and use it for temporary moves, not for parking a full colour. Two empty tubes means room to think. No empty tubes means a puzzle with no slack, and every move after that is forced.</p>
+
+<h2>Never pour onto a colour you cannot finish</h2>
+<p>A pour is legal when the receiving tube has room and either matches the top colour or is empty. Legal is not the same as useful. Pouring one unit of red onto a stack that already has three units is good. Pouring one unit of red onto a stack with one unit, when the remaining red units are buried under other colours, is how boards die: you started a colour you cannot complete.</p>
+<p>Before a pour, ask one question. Can I finish this colour in the next two moves? If not, do not start it.</p>
+
+<h2>Count completed colours, not moves</h2>
+<p>Every level has a fixed number of colours, and the board gets easier as colours complete, because a completed colour is permanent free space. Progress is not how many pours you made but how many tubes are finished and sealed.</p>
+<p>That changes the order you work in. Instead of solving the most visible colour, solve the colour with the most units on top. Finishing any colour early buys a free tube, and free tubes are what make the last third of a level possible.</p>
+
+<h2>When you are stuck, work backwards for three moves</h2>
+<p>A finished tube is one colour and nothing else. Which tube could have poured into it? That tells you where that colour must come from, and in turn which colour has to move first.</p>
+<p>Three moves of backwards reasoning uncovers a surprising number of dead ends, because most stuck boards are one pour away from an order you did not consider.</p>
+
+<h2>The two mistakes that cost the most</h2>
+<p>The first is pouring into a nearly full tube. It looks efficient and it removes your ability to use that tube for anything else. The second is shuffling: if a pour does not complete a colour, free a tube, or unblock a colour, it is not progress, it is motion. Two shuffles in a row usually means you should restart, because restarts are free and time is not.</p>
+
+<h2>A worked example</h2>
+<p>Suppose four colours are in play and you have one empty tube. Red has three units on top of a tube, blue has two on top of another, the rest is mixed.</p>
+<p>The instinct is to finish red because it is closest. Do that and you gain a sealed tube, which is good. But check where the last red unit is. If it sits under a blue unit, finishing red means moving blue first, which needs somewhere to put blue, which is your empty tube. So the order is: use the empty tube for blue, which unblocks red, then finish red, which frees the tube you just used.</p>
+<p>That is the shape of nearly every efficient solution: use the empty tube temporarily, not permanently. Players who get stuck park a colour in it, and parking turns a working hand into storage.</p>
+
+<h2>When to restart, honestly</h2>
+<p>Restart if two consecutive pours did not complete a colour, free a tube, or expose a buried colour. Restart if your only empty tube is holding a colour you cannot finish. Restart if you catch yourself pouring to see what happens.</p>
+
+<h2>Frequently asked</h2>
+<h3>Is there always a solution?</h3>
+<p>Yes. Colour sort levels are generated from a solved state and then shuffled by legal moves, so a solution exists by construction. What is not guaranteed is that your current position still has one, because a bad pour can create a state that is legal but dead.</p>
+<h3>Do hints cost anything?</h3>
+<p>In Potion Pour a hint shows the next pour, not the whole solution, so it is most useful when you are one move from unblocking a colour, and least useful when the board is already lost.</p>
+<h3>Does level order matter?</h3>
+<p>No. Colours and tubes increase with the level, but the logic is identical. If level sixty feels impossible, the habit that is missing is usually the count at the start.</p>
+
+<p>Use the first thirty seconds of any level to count colours and empty tubes before you pour anything. That habit is worth more than any hint.</p>
+
+<p><a class="btn" href="https://games.najura.com/potionpour/">Play Potion Pour</a></p>
+</article>
+</main>
+<footer>
+  <div class="wrap">
+    <a class="brand" href="/">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura
+    </a>
+    <div class="links">
+      <a href="https://games.najura.com/">Games</a>
+      <a href="/guides/">Guides</a>
+      <a href="https://app.najura.com/">Apps</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+    </div>
+    <div class="links">
+      <a href="/brickwise-privacy/privacy-policy.html">Brickwise privacy</a>
+      <a href="/potionpour-privacy/">Potion Pour privacy</a>
+      <a href="/peep-privacy/">Peep privacy</a>
+      <a href="/gilded-privacy/">Gilded privacy</a>
+    </div>
+    <small>&copy; <span id="year">2026</span> Najura, a brand of Najuvia LLC. Google Play and the Google Play logo are trademarks of Google LLC.</small>
+  </div>
+</footer>
+<script>
+(function(){
+  if (window.__najuraThemeBound) return;
+  window.__najuraThemeBound = true;
+  function paint(btn){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var label = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+  function setTheme(next){
+    document.documentElement.setAttribute('data-theme', next);
+    document.documentElement.style.colorScheme = next;
+    try { localStorage.setItem('najura-theme', next); } catch(e){}
+    Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), paint);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function(btn){
+    paint(btn);
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  });
+})();
+</script>
+</body>
+</html>

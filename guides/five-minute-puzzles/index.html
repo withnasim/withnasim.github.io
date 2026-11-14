@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>
+(function(){
+  var d = document.documentElement;
+  d.classList.add('js');
+  var stored = null;
+  try { stored = localStorage.getItem('najura-theme'); } catch(e){}
+  var theme = stored || 'dark';
+  d.setAttribute('data-theme', theme);
+  d.style.colorScheme = theme;
+})();
+</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWRCGHG');</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Designing a puzzle for a five minute break</title>
+<meta name="description" content="Why session length decides the design, how long a round should be, the tutorial we deleted, and the four things we refuse to ship.">
+<meta name="theme-color" content="#140F3D">
+<link rel="canonical" href="https://najura.com/guides/five-minute-puzzles/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Designing a puzzle for a five minute break">
+<meta property="og:description" content="Why session length decides the design, how long a round should be, the tutorial we deleted, and the four things we refuse to ship.">
+<meta property="og:url" content="https://najura.com/guides/five-minute-puzzles/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/najura.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Designing a puzzle for a five minute break","author":{"@type":"Organization","name":"Najura"},"publisher":{"@type":"Organization","name":"Najura"},"datePublished":"14 November 2026"}
+</script>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Najura home">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura
+    </a>
+    <nav aria-label="Main">
+      <a href="https://games.najura.com/">Games</a>
+      <a href="/guides/">Guides</a>
+      <a href="https://app.najura.com/">Apps</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<article class="prose">
+<p class="meta"><a href="/guides/">Guides</a> &middot; Studio notes</p>
+<h1>Designing a puzzle for a five minute break</h1>
+
+<p>I design games that end. Not games that end when you run out of lives, but games that finish because you closed the app and went back to your tea. It sounds like a small thing. It changes almost every decision after it.</p>
+
+<h2>Where the rule came from</h2>
+<p>The first version of Brickwise had a timer. Not a hard limit, just a clock counting up, because that is what the games I played had. I gave it to my cousin, who plays on a bus with one hand. She put it down twice to hold the rail, and both times she came back to a board that had moved on without her. She did not say the game was bad. She just stopped opening it.</p>
+<p>That was the whole lesson. The game was competing with her life and losing.</p>
+
+<h2>What a five minute game has to be</h2>
+<p>Openable in a queue. Playable with one thumb. Abandonable at any second without losing anything that matters.</p>
+<p>That last one is where most mobile games go wrong. A lost round is fine. A lost streak, a lost purchase, a rank that drops while you are away, those are punishments for having a life. Nobody comes back to be punished twice.</p>
+
+<h2>Rounds should be shorter than you think</h2>
+<p>I aim for sixty to a hundred and twenty seconds. Under a minute feels like a demo. Over two minutes, one mistake costs more than the break was worth, and that is the point where people start saying they will play later. Later is never.</p>
+<p>Restarting matters as much as length. If restarting takes three taps and a loading screen, nobody restarts. They carry a dead board around for two minutes to avoid the friction, which is exactly the worst outcome: no progress, no ending.</p>
+
+<h2>The tutorial we deleted</h2>
+<p>Our first build opened with two screens of text explaining the rules. I watched ten people play it. All ten skipped the text. All ten worked out the rules from the first board in about twenty seconds.</p>
+<p>So the tutorial was not teaching anything. It was standing between the player and the game.</p>
+<p>What replaced it is a first level where losing is nearly impossible, plus one line that appears inside the board when it becomes relevant. One line about keeping a square of space free. One line about the empty tube. Rules arrive when they are needed, not before.</p>
+
+<h2>Three bands, not a curve</h2>
+<p>I stopped thinking in difficulty curves. Curves are smooth, and smooth is boring. Three bands work better.</p>
+<p>The first is a handshake. Nothing can go wrong, and the player learns what the game feels like. The second is the real game: mistakes are possible, but they are recoverable, and the player starts noticing their own habits. The third band should feel like a different game, because by then the player is not learning rules any more. They are playing against the board.</p>
+<p>Most puzzle games I play fail in the second band. They jump to the third, which feels like difficulty and is really just a shortage of graduated ideas.</p>
+
+<h2>Things we will not ship</h2>
+<p>No timers that punish thinking. A puzzle that hurries you is a puzzle you solve by guessing, and guessing is not the skill I want to teach.</p>
+<p>No energy. Being locked out of a free game for four hours is not a business model, it is a hostage situation with nice colours.</p>
+<p>No ads in the middle of a round. In a five minute session, the interruption is the session.</p>
+<p>No streak that scolds you. If you miss a day, the game says nothing, because your day was probably busy and it is not the game's business.</p>
+
+<h2>How we test, and what we ignore</h2>
+<p>We test with family, neighbours and whoever is in the shop. I write down what they do wrong, not what they say. The gap between those two is where the design work is. Someone will tell you the game is clear and then spend forty seconds looking for the next button.</p>
+<p>I do not trust the question "is it fun". Nobody says no to that. The only signal I believe is whether they open it again without being asked.</p>
+
+<h2>Questions I get asked</h2>
+<h3>How long is one round, really?</h3>
+<p>One to two minutes at the start. Longer only when someone is chasing their own best, which is their choice and not something the game demands.</p>
+<h3>Why is there no undo?</h3>
+<p>Undo turns a puzzle into a search problem with a safety net. Restarting is the honest version, and it is free.</p>
+<h3>Why no daily reward?</h3>
+<p>A reward for opening an app teaches people to open the app. I would rather the reason to come back be the board.</p>
+<h3>How do you know a level works?</h3>
+<p>When someone loses it and starts it again without complaining. That reaction is worth more than any number I could design into a dashboard.</p>
+
+<p><a class="btn" href="https://games.najura.com/">Play a round</a></p>
+
+<div class="posts" style="margin-top:56px">
+  <a class="post-card" href="/guides/peep-offline/">
+    <span class="meta">Read next &middot; Studio notes</span>
+    <h2>Why we made Peep offline and free</h2>
+    <p>What a talking pet costs to run, and the child safety decisions behind it.</p>
+  </a>
+</div>
+<div class="cta-row" style="margin-top:32px"><a class="btn" href="https://games.najura.com/">Play the games</a></div>
+</article>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="/">
+        <span class="mark" aria-hidden="true">
+          <span class="gem g-red"></span><span class="gem g-yellow"></span>
+          <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+        </span>
+        Najura
+      </a>
+      <p class="foot-line">Free, offline puzzle games and friendly apps from a small independent studio.</p>
+    </div>
+    <div class="foot-cols">
+      <div>
+        <h4>Explore</h4>
+        <a href="https://games.najura.com/">Games</a>
+        <a href="/guides/">Guides</a>
+        <a href="https://app.najura.com/">Apps</a>
+      </div>
+      <div>
+        <h4>Studio</h4>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+      </div>
+    </div>
+    <small>&copy; <span id="year">2026</span> Najura, a brand of Najuvia LLC. Google Play and the Google Play logo are trademarks of Google LLC.</small>
+  </div>
+</footer>
+<script>
+  (function(){
+    var y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
+    var io = "IntersectionObserver" in window ? new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.12 }) : null;
+    document.querySelectorAll(".reveal").forEach(function(el, i){
+      el.style.transitionDelay = (i % 4) * 70 + "ms";
+      if (io) io.observe(el); else el.classList.add("in");
+    });
+  })();
+</script>
+<script>
+(function(){
+  if (window.__najuraThemeBound) return;
+  window.__najuraThemeBound = true;
+  function paint(btn){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var label = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+  function setTheme(next){
+    document.documentElement.setAttribute('data-theme', next);
+    document.documentElement.style.colorScheme = next;
+    try { localStorage.setItem('najura-theme', next); } catch(e){}
+    Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), paint);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function(btn){
+    paint(btn);
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  });
+})();
+</script>
+<div id="consent" class="consent" hidden>
+  <p>We use cookies for analytics, and advertising cookies if you accept. <a href="/privacy/">Privacy policy</a>.</p>
+  <div class="consent-actions">
+    <button type="button" data-consent="essential">Essential only</button>
+    <button type="button" data-consent="all" class="primary">Accept</button>
+  </div>
+</div>
+<script>
+(function(){
+  try {
+    var stored = localStorage.getItem('najura-consent');
+    var el = document.getElementById('consent');
+    if (!el) return;
+    if (!stored) el.hidden = false;
+    el.addEventListener('click', function(e){
+      var b = e.target.closest('[data-consent]');
+      if (!b) return;
+      var choice = b.getAttribute('data-consent');
+      localStorage.setItem('najura-consent', choice);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({event:'consent_choice', consent: choice});
+      el.hidden = true;
+    });
+  } catch(e) {}
+})();
+</script>
+<style>
+.consent{position:fixed;left:16px;right:16px;bottom:16px;z-index:60;display:flex;gap:16px;align-items:center;
+ justify-content:space-between;flex-wrap:wrap;padding:14px 18px;border-radius:16px;background:rgba(20,15,61,.96);
+ border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 40px rgba(0,0,0,.35);color:#F5F2FF;
+ font:400 14px/1.5 Nunito,system-ui,sans-serif;max-width:760px;margin:0 auto}
+.consent p{margin:0;color:#CFC8EE}
+.consent a{color:#FFC93C}
+.consent-actions{display:flex;gap:8px;flex:0 0 auto}
+.consent button{cursor:pointer;border-radius:999px;padding:9px 16px;font:600 13px/1 Nunito,system-ui,sans-serif;
+ border:1px solid rgba(255,255,255,.22);background:transparent;color:#F5F2FF}
+.consent button.primary{background:#FFC93C;color:#241A00;border-color:#FFC93C}
+@media (max-width:560px){.consent{left:10px;right:10px;bottom:10px;padding:12px 14px}.consent-actions{width:100%}}
+</style>
+</body>
+</html>

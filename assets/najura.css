@@ -321,3 +321,14 @@ html[data-theme="light"] .gold {
 :root[data-theme="dark"] .themebtn .ico-moon { opacity: 1; transform: rotate(0deg); }
 @media (max-width: 640px) { .nav .themebtn { margin-left: auto; } }
 @media print { .themebtn { display: none !important; } }
+
+/* ---------- footer: grouped columns, scales with more games ---------- */
+footer .foot-top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+footer .foot-line { color: var(--text-dim); font-size: 15px; max-width: 420px; margin: 0; }
+footer .foot-cols { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 28px; margin-bottom: 26px; }
+footer .foot-cols h4 { font-family: "Fredoka", sans-serif; font-size: 13px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--text-dim); margin: 0 0 12px; font-weight: 600; }
+footer .foot-cols div { display: flex; flex-direction: column; gap: 9px; }
+footer .foot-cols a { color: var(--text); font-size: 15px; text-decoration: none; }
+footer .foot-cols a:hover { color: var(--gold); }
+@media (max-width: 640px) { footer .foot-cols { grid-template-columns: 1fr 1fr; gap: 22px; } }

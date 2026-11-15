@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>
+/* theme boot: runs before first paint */
+(function(){
+  var d = document.documentElement;
+  d.classList.add('js');
+  var stored = null;
+  try { stored = localStorage.getItem('najura-theme'); } catch(e){}
+  // brand default is dark; light is an explicit choice remembered per browser
+  var theme = stored || 'dark';
+  d.setAttribute('data-theme', theme);
+  d.style.colorScheme = theme;
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'light' ? '#FAF6EC' : '#140F3D');
+})();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Search — Play Online or Print Free | Najura</title>
+<meta name="description" content="Play a word search right in your browser, or make your own printable puzzle with an answer key. Teacher mode builds a whole class set from one word list. Free, no sign-up, nothing uploaded.">
+<link rel="canonical" href="https://najura.com/tools/word-search/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/najura.css">
+<meta name="theme-color" content="#FAF6EC">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Word Search — Play Online or Print Free">
+<meta property="og:description" content="Play in the browser or print a puzzle with its answer key. Teacher mode makes a whole class set from one word list.">
+<meta property="og:url" content="https://najura.com/tools/word-search/">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWRCGHG');</script>
+<!-- End Google Tag Manager -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebApplication","name":"Word Search — Play or Print","url":"https://najura.com/tools/word-search/","applicationCategory":"GameApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"Najura","url":"https://najura.com/"}},
+ {"@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"Can I play the word search in my browser?","acceptedAnswer":{"@type":"Answer","text":"Yes. Switch to Play, then drag across the letters of a word, or tap the first letter and then the last one. Found words are crossed off the list."}},
+  {"@type":"Question","name":"Can I print the puzzle?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Print tab builds a printable A4 puzzle with a matching answer key."}},
+  {"@type":"Question","name":"How do I make a different puzzle for each student?","acceptedAnswer":{"@type":"Answer","text":"Use Teacher mode in the Print tab: choose the number of copies and the tool builds that many different layouts from the same word list, each with its own answer key."}}]}]}
+</script>
+<style>
+
+  /* ---------- tool page (brand dark theme, reuses najura.css) ---------- */
+  body{background:var(--bg);color:var(--text)}
+  .glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .glow::before,.glow::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+  .glow::before{width:900px;height:900px;top:-430px;left:-220px;background:radial-gradient(circle,#6A3DF0,transparent 65%)}
+  .glow::after{width:820px;height:820px;bottom:-430px;right:-260px;background:radial-gradient(circle,#1FB6A6,transparent 65%);opacity:.32}
+  main{position:relative;z-index:1}
+  .hero{padding:64px 0 10px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:11.5px;font-weight:800;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim)}
+  .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:var(--line)}
+  .hero h1{font-size:clamp(34px,5.2vw,58px);margin:16px 0 14px;color:var(--text)}
+  .lede{font-size:clamp(16px,1.9vw,19px);color:var(--text-dim);max-width:60ch;margin:0 auto}
+  .trust{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:22px 0 0;padding:0;list-style:none;
+    font-size:13.5px;font-weight:700;color:var(--text-dim)}
+  .trust li{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);
+    border-radius:999px;padding:6px 13px}
+  .trust li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    padding:26px;margin:34px 0 0}
+  .tabsrow{text-align:center}
+  .tabs{display:inline-flex;padding:5px;gap:4px;background:rgba(255,255,255,.05);border-radius:14px;
+    margin:0 auto 22px;border:1px solid var(--line)}
+  .tab{appearance:none;border:0;background:transparent;font:inherit;font-weight:800;font-size:14.5px;
+    color:var(--text-dim);padding:10px 20px;border-radius:10px;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--surface-2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+  label{display:block;font-weight:800;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);margin:0 0 7px}
+  textarea,select,input[type=text]{background:rgba(255,255,255,.05);border:1px solid var(--line);
+    color:var(--text);border-radius:14px}
+  textarea{width:100%;min-height:92px;padding:13px 15px;font:inherit;font-size:16px;resize:vertical}
+  select,input[type=text]{width:100%;padding:11px 13px;font:inherit;font-size:15px}
+  textarea::placeholder{color:#8F88BD}
+  textarea:focus,select:focus,input:focus{outline:2px solid var(--gold);outline-offset:1px}
+  .hint{font-size:13px;color:var(--text-dim);margin:7px 0 0}
+  .row{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
+  .row>div{flex:1 1 170px}
+  .checks{display:flex;gap:10px 20px;flex-wrap:wrap;margin-top:18px}
+  .checks label{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;margin:0;
+    text-transform:none;letter-spacing:0;color:var(--text)}
+  input[type=checkbox]{width:17px;height:17px;accent-color:var(--gold)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  button{font:inherit}
+  .btn{appearance:none;border:0;border-radius:13px;padding:13px 22px;font-weight:800;font-size:15px;
+    cursor:pointer;transition:transform .06s ease,background .15s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:linear-gradient(180deg,#FFF0B3,var(--gold) 55%,var(--gold-deep));color:#3B2A05;
+    box-shadow:0 10px 24px -12px rgba(242,158,31,.8), inset 0 1px 0 rgba(255,255,255,.5)}
+  .btn-primary:hover{filter:brightness(1.05)}
+  .btn-ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
+  .btn-ghost:hover{background:rgba(255,255,255,.13)}
+  .status{margin-top:14px;font-size:14px;color:var(--text-dim);min-height:20px}
+  .status.warn{color:#FFC8A8}
+
+  .playhead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .progress{font-weight:800;font-size:14px;color:var(--text-dim);letter-spacing:.03em}
+  .progress b{color:var(--gold);font-size:16px}
+  .timer{font-variant-numeric:tabular-nums;font-weight:800;color:var(--text);font-size:16px;
+    background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+  .playwrap{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:26px;align-items:start}
+  .board{display:grid;gap:2px;margin:0 auto;width:max-content;touch-action:none;user-select:none;
+    -webkit-user-select:none;padding:8px;border-radius:18px;background:rgba(255,255,255,.04);
+    border:1px solid var(--line)}
+  .cell{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;
+    font-family:ui-monospace,Menlo,monospace;font-size:calc(var(--cell) * .52);font-weight:700;
+    color:var(--text);border-radius:6px;cursor:pointer;transition:background .08s ease,color .08s ease}
+  .cell:hover{background:rgba(255,255,255,.1)}
+  .cell.sel{background:linear-gradient(180deg,#FFF0B3,var(--gold) 60%,var(--gold-deep));color:#33240A}
+  .cell.found{background:rgba(60,224,192,.18);color:#9BF2E0}
+  .cell.found.sel{background:linear-gradient(180deg,#FFF0B3,var(--gold) 60%,var(--gold-deep));color:#33240A}
+  @keyframes hintpulse{0%,100%{background:rgba(255,201,60,.15)}50%{background:rgba(255,201,60,.45)}}
+  .cell.hintword{animation:hintpulse .9s ease 1}
+  .words{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .words li{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;font-weight:700;
+    font-size:14.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--text)}
+  .words li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--line);flex:none}
+  .words li.done{color:#7C74A8;text-decoration:line-through}
+  .words li.done::before{background:var(--teal)}
+  .winning{display:none;margin-top:18px;border:1px solid rgba(60,224,192,.35);background:rgba(60,224,192,.1);
+    border-radius:16px;padding:16px 18px}
+  .winning.show{display:block}
+  .winning h3{font-size:20px;margin:0 0 4px;color:var(--text)}
+  .winning p{margin:0;color:var(--text-dim);font-size:14.5px}
+
+  /* printable sheets stay paper-white, they read as paper on the dark page */
+  #output{margin-top:26px}
+  .sheet{background:#FDFBF4;color:#1B2530;border:1px solid rgba(255,255,255,.16);border-radius:18px;
+    padding:26px;margin-bottom:20px;box-shadow:0 20px 40px -24px rgba(0,0,0,.7)}
+  .sheet .kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:#6A7A72;
+    margin:0 0 5px;font-weight:800}
+  .sheet h2{color:#17251F;margin:0 0 14px;font-size:23px}
+  .puzzle{display:grid;gap:0;margin:0 auto;width:max-content;font-family:ui-monospace,Menlo,monospace}
+  .puzzle div{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;
+    font-size:calc(var(--cell) * .6);text-transform:uppercase;color:#1B2530}
+  .puzzle div.hit{background:#CBE8D6;border-radius:4px;font-weight:700;color:#17453A}
+  .wordlist{display:flex;flex-wrap:wrap;gap:7px 18px;margin:18px 0 0;padding:0;list-style:none;
+    font-size:14.5px;text-transform:uppercase;letter-spacing:.03em}
+  .wordlist li{color:#33413C;font-weight:700}
+  .legend{font-size:12.5px;color:#5E6F67;margin:10px 0 0}
+
+  .prose{max-width:68ch;margin:52px auto 0}
+  .rule{height:1px;background:var(--line);border:0;margin:44px auto 0;max-width:68ch}
+  footer{margin-top:56px}
+
+  /* light-theme corrections for game states */
+  html[data-theme="light"] .cell.found{background:rgba(47,122,85,.3);color:#0E3B29;font-weight:800}
+  html[data-theme="light"] .cell.found.sel{background:linear-gradient(180deg,#FFF0B3,var(--gold) 60%,var(--gold-deep));color:#33240A}
+  html[data-theme="light"] .cell:hover{background:rgba(23,37,31,.06)}
+  html[data-theme="light"] .words li.done{color:#93A29B}
+  html[data-theme="light"] .winning{border-color:rgba(34,89,63,.28);background:rgba(34,89,63,.07)}
+  html[data-theme="light"] .board{background:rgba(255,255,255,.55)}
+  html[data-theme="light"] .sheet{box-shadow:0 18px 36px -26px rgba(23,37,31,.5)}
+
+  @media (max-width:820px){
+    .playwrap{grid-template-columns:1fr}
+    .words{flex-direction:row;flex-wrap:wrap;gap:6px 14px}
+    .words li{padding:4px 8px}
+    .card{padding:18px;border-radius:22px}
+    .hero{padding:40px 0 4px}
+  }
+  @media print{
+    body{background:#fff}
+    body>*:not(main){display:none!important}
+    main>*:not(#output){display:none!important}
+    .wrap{padding:0;max-width:none;width:auto}
+    #output{margin:0}
+    .sheet{background:#fff;border:0;box-shadow:none;padding:0;margin:0 0 8mm;page-break-after:always;
+      page-break-inside:avoid;color:#111}
+    .sheet:last-child{page-break-after:auto}
+    .puzzle div{--cell:9mm;font-size:9mm;line-height:1;color:#111}
+    .puzzle div.hit{background:#DCEFE4}
+    .sheet h2{color:#222}
+  }
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWRCGHG" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<div class="glow" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="https://najura.com/" aria-label="Najura home">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura <span style="color:var(--text-dim)">Tools</span>
+    </a>
+    <nav aria-label="Main">
+      <a href="/games/">Games</a>
+      <a href="/blog/">Blog</a>
+      <button class="themebtn" data-theme-toggle type="button" aria-label="Switch to light theme" title="Switch to light theme" aria-pressed="true">
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.4A8.6 8.6 0 1 1 9.6 3.5a6.9 6.9 0 0 0 10.9 10.9z"/></svg>
+      </button>
+      <a class="btn" href="https://najura.com/">Najura</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Najura Tools · Free</p>
+      <h1>Word search, played or printed</h1>
+      <p class="lede">Play a puzzle right here in your browser, or build a printable sheet for a class — with answer keys, in one click.</p>
+      <ul class="trust">
+        <li>No sign-up</li>
+        <li>Nothing uploaded</li>
+        <li>Works offline</li>
+      </ul>
+    </section>
+
+    <div class="card">
+      <div class="tabsrow">
+        <div class="tabs" role="tablist" aria-label="Mode">
+          <button class="tab" id="tab-play" role="tab" aria-selected="true" aria-controls="panel-play">Play</button>
+          <button class="tab" id="tab-print" role="tab" aria-selected="false" aria-controls="panel-print">Print</button>
+        </div>
+      </div>
+
+      <!-- PLAY -->
+      <div id="panel-play" role="tabpanel" aria-labelledby="tab-play">
+        <div class="playhead">
+          <p class="progress"><b id="found-count">0</b> / <span id="total-count">8</span> words found</p>
+          <div style="display:flex;gap:10px;align-items:center">
+            <p class="timer" id="timer">0:00</p>
+            <button class="btn btn-ghost" id="sound-toggle" aria-pressed="true" title="Sound on"
+              style="padding:8px 12px;font-size:14px">Sound on</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:0;margin-bottom:18px">
+          <div style="flex:2 1 260px">
+            <label for="play-words-input">Your words</label>
+            <textarea id="play-words-input" spellcheck="false" style="min-height:64px" aria-describedby="play-hint">LANTERN
+GARDEN
+RIVER
+PUZZLE
+COZY
+HARVEST
+MITTEN
+WINDOW</textarea>
+            <p class="hint" id="play-hint">Change the list, or pick a theme below, then press New puzzle.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px" id="theme-chips">
+              <button class="btn btn-primary theme" data-theme="random" id="random-words"
+                style="padding:7px 14px;font-size:13.5px">🎲 Random words</button>
+            </div>
+          </div>
+          <div style="flex:1 1 150px">
+            <label for="difficulty">Difficulty</label>
+            <select id="difficulty">
+              <option value="easy">Easy</option>
+              <option value="normal" selected>Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+            <p class="hint">Easy hides diagonals; Hard adds diagonals and backwards words.</p>
+          </div>
+        </div>
+        <div class="playwrap">
+          <div class="board" id="board" aria-label="Word search board"></div>
+          <div>
+            <ul class="words" id="play-words"></ul>
+            <div class="actions" style="margin-top:16px">
+              <button class="btn btn-ghost" id="new-game">New puzzle</button>
+              <button class="btn btn-ghost" id="hint">Hint</button>
+            </div>
+          </div>
+        </div>
+        <div class="winning" id="winning" role="status" aria-live="polite">
+          <h3>Puzzle solved</h3>
+          <p id="win-text"></p>
+          <div class="actions">
+            <button class="btn btn-primary" id="play-again">Play another</button>
+            <button class="btn btn-ghost" id="print-this">Print this puzzle</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:14px">Drag across the letters — or tap the first letter, then the last. Words can run in any direction.</p>
+      </div>
+
+      <!-- PRINT -->
+      <div id="panel-print" role="tabpanel" aria-labelledby="tab-print" hidden>
+        <label for="words">Your words</label>
+        <textarea id="words" spellcheck="false">LANTERN
+GARDEN
+RIVER
+PUZZLE
+COZY
+HARVEST
+MITTEN
+WINDOW</textarea>
+        <p class="hint">One word per line, or separated by commas. Letters only — hyphens, spaces and accents are removed. Up to 30 words.</p>
+
+        <div class="row">
+          <div>
+            <label for="size">Grid size</label>
+            <select id="size">
+              <option value="auto" selected>Auto (fit the words)</option>
+              <option value="10">10 × 10</option>
+              <option value="12">12 × 12</option>
+              <option value="15">15 × 15</option>
+              <option value="18">18 × 18</option>
+            </select>
+          </div>
+          <div>
+            <label for="title">Puzzle title</label>
+            <input id="title" type="text" value="Najura Word Search" maxlength="48">
+          </div>
+          <div>
+            <label for="copies">Teacher mode — copies</label>
+            <select id="copies">
+              <option value="1" selected>1 puzzle</option>
+              <option value="2">2 different puzzles</option>
+              <option value="3">3 different puzzles</option>
+              <option value="5">5 different puzzles</option>
+              <option value="8">8 different puzzles</option>
+              <option value="10">10 different puzzles</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="checks">
+          <label><input type="checkbox" id="diag" checked> Diagonals</label>
+          <label><input type="checkbox" id="back"> Backwards</label>
+          <label><input type="checkbox" id="key" checked> Include answer keys</label>
+          <label><input type="checkbox" id="large"> Large print</label>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="gen">Generate sheets</button>
+          <button class="btn btn-ghost" id="print">Print / save as PDF</button>
+        </div>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div id="output"></div>
+
+    <hr class="rule">
+
+    <article class="prose">
+      <h2>Play it, or print it</h2>
+      <p>Most word search sites make you choose: a fiddly online game, or a printable sheet behind a sign-up form. This one does both from the same word list. Play the puzzle in the Play tab, and when you want paper, the Print tab builds a clean A4 sheet with a matching answer key.</p>
+
+      <h2>How to play</h2>
+      <p>Drag from the first letter to the last — straight lines only, sideways, up and down, or diagonally. On a phone, tap the first letter and then the last one. Found words get crossed off the list; the timer starts on your first move.</p>
+
+      <h2>Teacher mode: one word list, a whole class set</h2>
+      <p>In the Print tab, set the number of copies and the generator builds that many <em>different</em> puzzles from the same words — same list, different layout, so the child in the next seat cannot copy the answers. Each puzzle is numbered (<em>Puzzle 1 of 5</em>) and every one has its own answer key, printed after the puzzles in the same order.</p>
+      <p><strong>Large print</strong> switches to bigger letters and a tighter grid: good for young children, classroom display copies, and readers who need larger type.</p>
+
+      <h3>Good words to use</h3>
+      <ul>
+        <li><strong>Short and varied</strong> — mix 4-letter and 8-letter words. All 3-letter words makes a puzzle that solves itself.</li>
+        <li><strong>Themed sets</strong> — 10 to 15 words on one topic reads better than 30 random ones.</li>
+        <li><strong>Watch repeated letters</strong> — words that share letters are harder to find and more fun.</li>
+      </ul>
+
+      <h3>Difficulty, without extra settings</h3>
+      <p>Two toggles cover it: turning off <em>diagonals</em> makes an easy puzzle for young children, and turning on <em>backwards</em> makes an adult puzzle noticeably harder. Leave diagonals on and backwards off for the middle setting that suits most family puzzles.</p>
+
+      <h2>Frequently asked questions</h2>
+      <h3>Is it really free?</h3>
+      <p>Yes. No account, no watermark, no limit on how many puzzles you play or print.</p>
+      <h3>Do you store my words?</h3>
+      <p>No. The page runs entirely in your browser — once it has loaded it works without a connection, and your words are only held in memory.</p>
+      <h3>How do I print a different puzzle for each student?</h3>
+      <p>Open the Print tab and choose the number of copies under Teacher mode. Each copy is a different layout of the same words, with its own answer key.</p>
+      <h3>Can I use the puzzles commercially?</h3>
+      <p>The puzzles you build with your own words are yours — classrooms, parties, church bulletins, work newsletters. Please don't resell the tool itself.</p>
+      <h3>Why are some of my words missing from the printed sheet?</h3>
+      <p>Words that are too long for the grid, or that repeat a word already placed, are listed under the puzzle. Shorten them or choose a larger grid.</p>
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="https://najura.com/">
+      <span class="mark" aria-hidden="true">
+        <span class="gem g-red"></span><span class="gem g-yellow"></span>
+        <span class="gem g-cyan"></span><span class="gem g-purple"></span>
+      </span>
+      Najura
+    </a>
+    <div class="links">
+      <a href="https://najura.com/">najura.com</a>
+      <a href="/games/">Games</a>
+      <a href="/blog/">Blog</a>
+      <a href="https://najura.com/brickwise-privacy/privacy-policy.html">Privacy</a>
+      <a href="mailto:info@najura.com">Support: info@najura.com</a>
+    </div>
+    <small>&copy; <span id="year">2026</span> Najura, a brand of Najuvia LLC.</small>
+  </div>
+</footer>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  window.dataLayer = window.dataLayer || [];
+  function track(ev, data){
+    var o = { event: ev };
+    for (var k in data) o[k] = data[k];
+    window.dataLayer.push(o);
+  }
+
+  /* ---------- shared engine ---------- */
+  function parseWords(raw){
+    var parts = raw.split(/[\n,;]+/), seen = {}, out = [];
+    parts.forEach(function(p){
+      var w = p.replace(/[^A-Za-z]/g, "").toUpperCase();
+      if(!w) return;
+      if(w.length > 24) w = w.slice(0,24);
+      if(!seen[w]){ seen[w] = 1; out.push(w); }
+    });
+    return out.slice(0,30);
+  }
+  function dirs(diag, back){
+    var d = [[0,1],[1,0]];
+    if(diag) d.push([1,1],[1,-1]);
+    if(back){ d.push([0,-1],[-1,0]); if(diag) d.push([-1,-1],[-1,1]); }
+    return d;
+  }
+  function emptyGrid(n){
+    var g = [];
+    for(var r=0;r<n;r++){ var row=[]; for(var c=0;c<n;c++) row.push(""); g.push(row); }
+    return g;
+  }
+  function place(grid, word, ds, n, tries){
+    var t = tries || 260;
+    while(t-- > 0){
+      var d = ds[Math.floor(Math.random()*ds.length)];
+      var r = Math.floor(Math.random()*n), c = Math.floor(Math.random()*n);
+      var er = r + d[0]*(word.length-1), ec = c + d[1]*(word.length-1);
+      if(er < 0 || er >= n || ec < 0 || ec >= n) continue;
+      var ok = true, cells = [];
+      for(var i=0;i<word.length;i++){
+        var rr = r + d[0]*i, cc = c + d[1]*i, ch = grid[rr][cc];
+        if(ch && ch !== word[i]){ ok = false; break; }
+        cells.push([rr,cc]);
+      }
+      if(!ok) continue;
+      cells.forEach(function(p,i){ grid[p[0]][p[1]] = word[i]; });
+      return { word: word, cells: cells };
+    }
+    return null;
+  }
+  function build(words, n, diag, back){
+    var ds = dirs(diag, back), grid = emptyGrid(n), placed = [], missed = [];
+    words.slice().sort(function(a,b){ return b.length - a.length; }).forEach(function(w){
+      var p = place(grid, w, ds, n);
+      if(p) placed.push(p); else missed.push(w);
+    });
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(!grid[r][c]) grid[r][c] = LETTERS[Math.floor(Math.random()*26)];
+    return { grid: grid, placed: placed, missed: missed };
+  }
+  function fitSize(words, diag){
+    var longest = words.reduce(function(m,w){ return Math.max(m, w.length); }, 0);
+    var area = words.reduce(function(s,w){ return s + w.length; }, 0);
+    var n = Math.max(longest + 1, Math.ceil(Math.sqrt(area * (diag ? 2.6 : 3.4))));
+    return Math.min(24, Math.max(8, n));
+  }
+
+  /* ---------- tabs ---------- */
+  var tabPlay = $("tab-play"), tabPrint = $("tab-print");
+  var panelPlay = $("panel-play"), panelPrint = $("panel-print");
+  function showTab(which){
+    var play = which === "play";
+    tabPlay.setAttribute("aria-selected", play ? "true" : "false");
+    tabPrint.setAttribute("aria-selected", play ? "false" : "true");
+    panelPlay.hidden = !play;
+    panelPrint.hidden = play;
+    out().innerHTML = "";
+    track("ws_tab", { tab: which });
+  }
+  function out(){ return $("output"); }
+  tabPlay.addEventListener("click", function(){ showTab("play"); });
+  tabPrint.addEventListener("click", function(){ showTab("print"); });
+
+  /* ---------- play mode ---------- */
+  var game = null, sel = { active:false, cells:[], fixed:null };
+  var startedAt = 0, timerId = null;
+
+  function startTimer(){
+    if(timerId) return;
+    startedAt = Date.now();
+    timerId = setInterval(function(){
+      var s = Math.floor((Date.now() - startedAt)/1000);
+      $("timer").textContent = Math.floor(s/60) + ":" + String(s%60).padStart(2,"0");
+    }, 500);
+  }
+  function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+  function resetTimer(){ stopTimer(); $("timer").textContent = "0:00"; startedAt = 0; }
+
+  var THEMES = {
+    classroom: { label: "Classroom", words: ["HOMEWORK","PENCIL","TEACHER","LIBRARY","SPELLING","RECESS","NOTEBOOK","SCIENCE","ERASER","RULER","LESSON","CRAYON"] },
+    animals:   { label: "Animals",   words: ["TIGER","RABBIT","DOLPHIN","ELEPHANT","FALCON","OTTER","PANDA","TURTLE","MONKEY","ZEBRA","BEAVER","LIZARD"] },
+    winter:    { label: "Winter",    words: ["SNOWFLAKE","MITTEN","SCARF","SLEDGE","FROST","CANDLE","SWEATER","FIREPLACE","ICICLE","BLIZZARD","COCOA","PENGUIN"] },
+    space:     { label: "Space",     words: ["ORBIT","ROCKET","COMET","NEBULA","SATURN","GALAXY","ASTEROID","TELESCOPE","CRATER","LAUNCH","METEOR","MOON"] },
+    fruits:    { label: "Fruits",    words: ["APPLE","BANANA","CHERRY","MANGO","PAPAYA","GRAPES","LEMON","PEACH","PLUM","MELON","ORANGE","GUAVA"] },
+    sports:    { label: "Sports",    words: ["SOCCER","TENNIS","CRICKET","HOCKEY","RUGBY","BOXING","SWIMMING","RUNNING","CYCLING","SKIING","ROWING","DIVING"] },
+    ocean:     { label: "Ocean",     words: ["CORAL","OCTOPUS","SEAWEED","LAGOON","TIDE","WHALE","PEARL","HARBOUR","WAVE","REEF","SHELL","ANCHOR"] },
+    food:      { label: "Food",      words: ["BREAD","CHEESE","HONEY","PEPPER","NOODLE","BUTTER","YOGURT","GARLIC","TOMATO","OMELET","COOKIE","SALAD"] },
+    colors:    { label: "Colors",    words: ["CRIMSON","INDIGO","VIOLET","AMBER","SCARLET","OLIVE","TEAL","MAGENTA","IVORY","MAROON","GOLD","COPPER"] },
+    body:      { label: "Body",      words: ["ELBOW","SHOULDER","KNEE","ANKLE","FINGER","WRIST","MUSCLE","HEART","SPINE","THUMB","CHEEK","TOOTH"] }
+  };
+
+  function shuffle(a){
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a;
+  }
+  function wordsForTheme(key, count){
+    var w = (THEMES[key] && THEMES[key].words) ? THEMES[key].words.slice() : [];
+    shuffle(w);
+    return w.slice(0, count || 8);
+  }
+  function renderThemeChips(){
+    var box = $("theme-chips");
+    Object.keys(THEMES).forEach(function(key){
+      var b = document.createElement("button");
+      b.className = "btn btn-ghost theme";
+      b.dataset.theme = key;
+      b.style.padding = "7px 12px";
+      b.style.fontSize = "13.5px";
+      b.textContent = THEMES[key].label;
+      box.appendChild(b);
+    });
+  }
+  var soundOn = true, audioCtx = null;
+
+  function tone(freqs, dur){
+    if(!soundOn) return;
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      var t0 = audioCtx.currentTime;
+      freqs.forEach(function(f, i){
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = "sine"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t0 + i*0.06);
+        g.gain.exponentialRampToValueAtTime(0.14, t0 + i*0.06 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + i*0.06 + dur);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t0 + i*0.06); o.stop(t0 + i*0.06 + dur + 0.02);
+      });
+    }catch(e){}
+    if(navigator.vibrate) { try{ navigator.vibrate(12); }catch(e){} }
+  }
+
+  function newGame(){
+    var words = parseWords($("play-words-input").value);
+    if(words.length < 2) words = parseWords($("words").value);
+    if(words.length < 2) words = ["LANTERN","GARDEN","RIVER","PUZZLE","COZY","HARVEST","MITTEN","WINDOW"];
+    var diff = $("difficulty").value;
+    var diag = diff !== "easy", back = diff === "hard";
+    var n = fitSize(words, diag);
+    var res = build(words, n, diag, back);
+    game = { n: n, grid: res.grid, placed: res.placed, found: {}, remaining: res.placed.map(function(p){ return p.word; }), started:false };
+    anchor = null; drag.active = false; drag.start = null; sel.cells = [];   // reset any pending selection
+    resetTimer();
+    $("winning").classList.remove("show");
+    renderBoard();
+    renderWordList();
+    updateProgress();
+    track("ws_play_start", { word_count: words.length, grid: n, difficulty: diff, diagonals: diag ? "yes":"no", backwards: back ? "yes":"no" });
+  }
+
+  function cellSize(){
+    var n = game.n;
+    var vw = Math.min(window.innerWidth - 96, 520);
+    var px = Math.floor(vw / n) - 2;
+    var max = n <= 10 ? 46 : n <= 13 ? 40 : n <= 16 ? 34 : 28;
+    return Math.max(20, Math.min(max, px));
+  }
+
+  function renderBoard(){
+    var board = $("board");
+    board.innerHTML = "";
+    var px = cellSize();
+    board.style.setProperty("--cell", px + "px");
+    board.style.gridTemplateColumns = "repeat(" + game.n + ", var(--cell))";
+    for(var r=0;r<game.n;r++) for(var c=0;c<game.n;c++){
+      var d = document.createElement("div");
+      d.className = "cell";
+      d.dataset.r = r; d.dataset.c = c;
+      d.textContent = game.grid[r][c];
+      board.appendChild(d);
+    }
+    Object.keys(game.found).forEach(function(w){
+      game.found[w].forEach(function(p){ cellAt(p[0],p[1]).classList.add("found"); });
+    });
+  }
+
+
+  function cellAt(r,c){ return $("board").children[r * game.n + c]; }
+
+  function renderWordList(){
+    var ul = $("play-words");
+    ul.innerHTML = "";
+    game.placed.slice().sort(function(a,b){ return a.word.localeCompare(b.word); }).forEach(function(p){
+      var li = document.createElement("li");
+      li.textContent = p.word;
+      li.dataset.word = p.word;
+      ul.appendChild(li);
+    });
+  }
+
+  function updateProgress(){
+    var done = Object.keys(game.found).length;
+    $("found-count").textContent = done;
+    $("total-count").textContent = game.placed.length;
+    if(done === game.placed.length) win();
+  }
+
+  function win(){
+    stopTimer();
+    var s = startedAt ? Math.floor((Date.now()-startedAt)/1000) : 0;
+    $("win-text").textContent = "All " + game.placed.length + " words found in " +
+      Math.floor(s/60) + ":" + String(s%60).padStart(2,"0") + ".";
+    $("winning").classList.add("show");
+    tone([523, 659, 784, 1047], 0.22);
+    track("ws_play_complete", { seconds: s, words: game.placed.length, grid: game.n });
+  }
+
+  function clearSel(){
+    sel.cells.forEach(function(p){ var el = cellAt(p[0],p[1]); if(el) el.classList.remove("sel"); });
+    sel.cells = [];
+  }
+
+  function paintSel(cells){
+    clearSel();
+    sel.cells = cells;
+    cells.forEach(function(p){ var el = cellAt(p[0],p[1]); if(el) el.classList.add("sel"); });
+  }
+
+  function lineBetween(a, b){
+    var dr = b.r - a.r, dc = b.c - a.c;
+    if(!(dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc))) return null;
+    var steps = Math.max(Math.abs(dr), Math.abs(dc));
+    var sr = dr === 0 ? 0 : dr / Math.abs(dr);
+    var sc = dc === 0 ? 0 : dc / Math.abs(dc);
+    var cells = [];
+    for(var i=0;i<=steps;i++) cells.push([a.r + sr*i, a.c + sc*i]);
+    return cells;
+  }
+
+  function wordFromCells(cells){
+    return cells.map(function(p){ return game.grid[p[0]][p[1]]; }).join("");
+  }
+
+  function checkSelection(){
+    var cells = sel.cells.slice();
+    if(cells.length < 2){ clearSel(); return; }
+    var w = wordFromCells(cells);
+    var rev = w.split("").reverse().join("");
+    var hit = null;
+    if(game.remaining.indexOf(w) !== -1) hit = w;
+    else if(game.remaining.indexOf(rev) !== -1) hit = rev;
+    if(hit){
+      game.found[hit] = cells;
+      game.remaining = game.remaining.filter(function(x){ return x !== hit; });
+      cells.forEach(function(p){ var el = cellAt(p[0],p[1]); if(el) el.classList.add("found"); });
+      var li = $("play-words").querySelector('[data-word="' + hit + '"]');
+      if(li) li.classList.add("done");
+      tone([660, 880], 0.16);
+      updateProgress();
+      track("ws_word_found", { word_length: hit.length, words_left: game.remaining.length });
+    }
+    clearSel();
+  }
+
+  var drag = { active:false, start:null }, anchor = null;
+
+  function posFromEvent(e){
+    var x = (e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX));
+    var y = (e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY));
+    var el = document.elementFromPoint(x, y);
+    if(!el || !el.classList || !el.classList.contains("cell")) return null;
+    return { r: +el.dataset.r, c: +el.dataset.c };
+  }
+
+  board.addEventListener("pointerdown", function(e){
+    if(!game) return;
+    var p = posFromEvent(e);
+    if(!p) return;
+    e.preventDefault();
+    if(!game.started){ game.started = true; startTimer(); }
+    if(board.setPointerCapture){ try{ board.setPointerCapture(e.pointerId); }catch(err){} }
+
+    // second tap of a tap-tap selection
+    if(anchor){
+      var cells = lineBetween(anchor, p);
+      anchor = null;
+      if(cells && cells.length > 1){ paintSel(cells); checkSelection(); }
+      else { clearSel(); }
+      return;
+    }
+    drag.active = true; drag.start = p;
+    paintSel([[p.r, p.c]]);
+  });
+
+  board.addEventListener("pointermove", function(e){
+    if(!drag.active || !drag.start || !game) return;
+    var p = posFromEvent(e);
+    if(!p) return;
+    var cells = lineBetween(drag.start, p);
+    if(cells && cells.length > 1) paintSel(cells);
+  });
+
+  board.addEventListener("pointerup", function(e){
+    if(!game) return;
+    var wasDrag = drag.active, start = drag.start;
+    drag.active = false; drag.start = null;
+    if(!wasDrag) return;
+    if(sel.cells.length > 1){ checkSelection(); anchor = null; }
+    else if(start){ anchor = start; }        // arm tap-tap
+  });
+
+  board.addEventListener("pointercancel", function(){
+    drag.active = false; drag.start = null; anchor = null; clearSel();
+  });
+  window.addEventListener("resize", function(){ if(game){ renderBoard(); } });
+
+  $("sound-toggle").addEventListener("click", function(){
+    soundOn = !soundOn;
+    this.textContent = soundOn ? "Sound on" : "Sound off";
+    this.setAttribute("aria-pressed", soundOn ? "true" : "false");
+    if(soundOn) tone([880], 0.12);
+    track("ws_sound", { state: soundOn ? "on" : "off" });
+  });
+  function useTheme(key){
+    var isRandom = key === "random";
+    var pick = key;
+    if(isRandom){
+      var keys = Object.keys(THEMES);
+      pick = keys[Math.floor(Math.random()*keys.length)];
+    }
+    var count = isRandom ? 6 + Math.floor(Math.random()*5) : 8;   // 6-10 words
+    var list = wordsForTheme(pick, count);
+    $("play-words-input").value = list.join("\n");
+    newGame();
+    track("ws_theme", { theme: isRandom ? "random:" + pick : pick, word_count: list.length });
+  }
+  renderThemeChips();
+  $("theme-chips").addEventListener("click", function(e){
+    var btn = e.target.closest ? e.target.closest(".theme") : null;
+    if(!btn || !btn.dataset.theme) return;
+    useTheme(btn.dataset.theme);
+  });
+  $("difficulty").addEventListener("change", function(){ newGame(); });
+
+  $("new-game").addEventListener("click", newGame);
+  $("play-again").addEventListener("click", newGame);
+  $("print-this").addEventListener("click", function(){
+    // regenerate printable sheets from the played board
+    var words = game.placed.map(function(p){ return p.word; });
+    var n = game.n;
+    renderSheets([{ grid: game.grid, placed: game.placed, missed: [] }], n, words, 1, false);
+    showTab("print");
+    window.print();
+  });
+  $("hint").addEventListener("click", function(){
+    if(!game || !game.remaining.length) return;
+    var w = game.remaining[0];
+    var p = game.placed.filter(function(x){ return x.word === w; })[0];
+    p.cells.forEach(function(c){
+      var el = cellAt(c[0],c[1]);
+      el.classList.add("hintword");
+      setTimeout(function(){ el.classList.remove("hintword"); }, 950);
+    });
+    track("ws_hint", { word: w });
+  });
+
+  /* ---------- print mode ---------- */
+  function renderCells(grid, placed, large){
+    var n = grid.length, px;
+    if(large) px = n <= 10 ? 44 : n <= 14 ? 38 : n <= 18 ? 32 : 27;
+    else px = n <= 10 ? 38 : n <= 14 ? 32 : n <= 18 ? 26 : 22;
+    var box = document.createElement("div");
+    box.className = "puzzle";
+    box.style.setProperty("--cell", px + "px");
+    box.style.gridTemplateColumns = "repeat(" + n + ", var(--cell))";
+    var hit = {};
+    (placed || []).forEach(function(p){ p.cells.forEach(function(c){ hit[c[0]+","+c[1]] = 1; }); });
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++){
+      var d = document.createElement("div");
+      d.textContent = grid[r][c];
+      if(hit[r+","+c]) d.className = "hit";
+      box.appendChild(d);
+    }
+    var wrap = document.createElement("div");
+    wrap.style.overflowX = "auto";
+    wrap.appendChild(box);
+    return wrap;
+  }
+  function sheet(sub, title, grid, placed, large, cls){
+    var s = document.createElement("section");
+    s.className = "sheet" + (cls ? " " + cls : "");
+    var k = document.createElement("p"); k.className = "kicker"; k.textContent = sub || "";
+    var h = document.createElement("h2"); h.textContent = title;
+    s.appendChild(k); s.appendChild(h); s.appendChild(renderCells(grid, placed, large));
+    return s;
+  }
+  var sheets = 0;
+  function renderSheets(puzzles, n, words, copies, large){
+    var o = out();
+    o.innerHTML = "";
+    var title = ($("title").value || "Word Search").trim();
+    var withKeys = $("key").checked;
+    puzzles.forEach(function(res, idx){
+      var sub = copies > 1 ? "Puzzle " + (idx+1) + " of " + copies : "Find " + res.placed.length + " words";
+      var s = sheet(sub, title, res.grid, null, large);
+      var ul = document.createElement("ul"); ul.className = "wordlist";
+      res.placed.slice().sort(function(a,b){ return a.word.localeCompare(b.word); }).forEach(function(p){
+        var li = document.createElement("li"); li.textContent = p.word; ul.appendChild(li);
+      });
+      s.appendChild(ul);
+      o.appendChild(s);
+    });
+    if(withKeys){
+      puzzles.forEach(function(res, idx){
+        var sub = copies > 1 ? "Answer key — puzzle " + (idx+1) + " of " + copies : "Answer key";
+        var s = sheet(sub, title, res.grid, res.placed, large);
+        var lg = document.createElement("p"); lg.className = "legend";
+        lg.textContent = "Highlighted cells mark where each word sits.";
+        s.appendChild(lg);
+        o.appendChild(s);
+      });
+    }
+    sheets = puzzles.length + (withKeys ? puzzles.length : 0);
+  }
+
+  function generate(){
+    var words = parseWords($("words").value);
+    var status = $("status");
+    if(words.length < 2){
+      status.className = "status warn";
+      status.textContent = "Add at least two words (letters only).";
+      return;
+    }
+    var diag = $("diag").checked, back = $("back").checked, large = $("large").checked;
+    var copies = parseInt($("copies").value, 10) || 1;
+    var sizeSel = $("size").value;
+    var n = fitSize(words, diag);
+    if(sizeSel !== "auto") n = Math.max(parseInt(sizeSel,10), n);
+
+    var puzzles = [], missedAll = [];
+    for(var i=0;i<copies;i++){
+      var res = build(words, n, diag, back);
+      puzzles.push(res);
+      res.missed.forEach(function(w){ if(missedAll.indexOf(w) === -1) missedAll.push(w); });
+    }
+    renderSheets(puzzles, n, words, copies, large);
+
+    var msg = copies > 1
+      ? "Built " + copies + " different puzzles (" + n + " × " + n + ", " + puzzles[0].placed.length + " words each)."
+      : "Sheet built: " + n + " × " + n + " grid, " + puzzles[0].placed.length + " words placed.";
+    if(missedAll.length) msg += " Could not fit: " + missedAll.join(", ") + " — try a larger grid.";
+    status.className = missedAll.length ? "status warn" : "status";
+    status.textContent = msg;
+    track("ws_generate", { word_count: words.length, grid: n, puzzles: copies,
+      answer_keys: $("key").checked ? "yes":"no", large_print: large ? "yes":"no" });
+  }
+
+  $("gen").addEventListener("click", generate);
+  $("print").addEventListener("click", function(){
+    if(!sheets) generate();
+    track("ws_print", { sheets: sheets });
+    window.print();
+  });
+  $("words").addEventListener("keydown", function(e){
+    if((e.metaKey || e.ctrlKey) && e.key === "Enter") generate();
+  });
+
+  newGame();
+})();
+</script>
+<script>
+/* theme switch behaviour */
+(function(){
+  if (window.__najuraThemeBound) return;
+  window.__najuraThemeBound = true;
+  function paint(btn){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var label = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+  function setTheme(next){
+    document.documentElement.setAttribute('data-theme', next);
+    document.documentElement.style.colorScheme = next;
+    try { localStorage.setItem('najura-theme', next); } catch(e){}
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', next === 'light' ? '#FAF6EC' : '#140F3D');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), paint);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function(btn){
+    paint(btn);
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  });
+})();
+</script>
+</body>
+</html>

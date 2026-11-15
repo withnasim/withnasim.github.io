@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>
+(function(){
+  var d = document.documentElement;
+  d.classList.add('js');
+  var stored = null;
+  try { stored = localStorage.getItem('najura-theme'); } catch(e){}
+  var theme = stored || 'dark';
+  d.setAttribute('data-theme', theme);
+  d.style.colorScheme = theme;
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'light' ? '#FAF6EC' : '#140F3D');
+})();
+</script>
+
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -74,18 +88,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="/games/" aria-label="Najura Games home">
+    <a class="brand" href="/" aria-label="Najura home">
       <span class="mark" aria-hidden="true">
         <span class="gem g-red"></span><span class="gem g-yellow"></span>
         <span class="gem g-cyan"></span><span class="gem g-purple"></span>
       </span>
-      Najura <span style="color:var(--text-dim);font-weight:600">Games</span>
+      Najura
     </a>
     <nav aria-label="Main">
-      <a href="/games/">All games</a>
-      <a href="https://najura.com/blog/">Blog</a>
-      <a href="https://najura.com/">Najura</a>
-      <a class="btn" href="whisker-river/">Play now</a>
+      <a href="/games/">Games</a>
+      <a href="/guides/">Guides</a>
+      <a href="/tools/">Tools</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <button class="themebtn" data-theme-toggle type="button" aria-label="Switch to light theme" title="Switch to light theme" aria-pressed="true">
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.4A8.6 8.6 0 1 1 9.6 3.5a6.9 6.9 0 0 0 10.9 10.9z"/></svg>
+      </button>
+      <a class="btn" href="/games/">Play now</a>
     </nav>
   </div>
 </header>
@@ -165,11 +185,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="https://najura.com/">najura.com</a>
       <a href="/games/">All games</a>
       <a href="./">Instant Play</a>
-      <a href="https://najura.com/blog/">Blog</a>
+      <a href="/guides/">Blog</a>
       <a href="mailto:info@najura.com">Support: info@najura.com</a>
     </div>
     <small>© 2026 Najura, a brand of Najuvia LLC. Google Play and the Google Play logo are trademarks of Google LLC.</small>
   </div>
 </footer>
+<script>
+/* theme switch behaviour */
+(function(){
+  if (window.__najuraThemeBound) return;
+  window.__najuraThemeBound = true;
+  function paint(btn){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var label = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  }
+  function setTheme(next){
+    document.documentElement.setAttribute('data-theme', next);
+    document.documentElement.style.colorScheme = next;
+    try { localStorage.setItem('najura-theme', next); } catch(e){}
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', next === 'light' ? '#FAF6EC' : '#140F3D');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), paint);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-toggle]'), function(btn){
+    paint(btn);
+    btn.addEventListener('click', function(){
+      var cur = document.documentElement.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  });
+})();
+</script>
 </body>
 </html>

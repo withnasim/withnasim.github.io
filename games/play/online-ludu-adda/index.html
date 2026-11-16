@@ -91,6 +91,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 }
 </script>
 <style>
+
+      /* phones: the board must own the screen, dice in thumb reach */
+      @media (max-width:700px){
+        body.immersive .site-head, body.immersive .crumbs, body.immersive h1,
+        body.immersive .lead, body.immersive .badge-row, body.immersive .player-bar,
+        body.immersive .page > .wrap > *:not(.ludu-holder){ display:none !important; }
+        body.immersive { overflow:hidden; }
+        body.immersive .ludu-holder{
+          position:fixed; inset:0; z-index:120; margin:0; padding:0; display:block;
+        }
+        body.immersive .ludu-frame{
+          width:100vw; height:100dvh; border-radius:0; display:block;
+        }
+        body.immersive #fsBtn{ display:none; }
+        #immersiveExit{ display:none; }
+        body.immersive #immersiveExit{
+          display:block; position:fixed; left:10px; top:10px; z-index:130;
+          background:rgba(20,16,40,.86); color:#fff; border:0; border-radius:12px;
+          padding:7px 12px; font:600 12px/1 system-ui,sans-serif; box-shadow:0 6px 18px rgba(0,0,0,.3);
+        }
+      }
   .ludu-frame{width:100%;height:min(84vh,880px);border:0;border-radius:20px;display:block;background:#f7f2e8;
     box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
   .ludu-holder{margin-top:14px;border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
@@ -142,6 +163,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="chip">Phone &amp; PC</span>
       </div>
 
+      <button id="immersiveExit" type="button" aria-label="Close the game">✕ বন্ধ</button>
       <div class="ludu-holder">
         <iframe class="ludu-frame" src="game.html?v=bbb6f62f" title="Online Ludu Adda game" loading="lazy"
                 allow="fullscreen; autoplay; clipboard-write"></iframe>
@@ -288,6 +310,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       setTheme(next);
     });
   });
+})();
+</script>
+
+<script>
+(function(){
+  /* on a phone the game takes the whole screen, so the board and the dice are always together */
+  function phone(){ return window.matchMedia('(max-width:700px)').matches; }
+  if (phone()) document.body.classList.add('immersive');
+  window.addEventListener('resize', function(){
+    if (phone()) document.body.classList.add('immersive');
+  });
+  var ex = document.getElementById('immersiveExit');
+  if (ex) ex.addEventListener('click', function(){ document.body.classList.remove('immersive'); });
 })();
 </script>
 </body>

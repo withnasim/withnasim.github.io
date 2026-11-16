@@ -28,4 +28,10 @@
   <url><loc>https://najura.com/potionpour-privacy/</loc><lastmod>2026-11-15</lastmod><priority>0.5</priority></url>
   <url><loc>https://najura.com/peep-privacy/</loc><lastmod>2026-11-15</lastmod><priority>0.5</priority></url>
   <url><loc>https://najura.com/gilded-privacy/</loc><lastmod>2026-11-15</lastmod><priority>0.5</priority></url>
+  <url>
+    <loc>https://najura.com/games/play/online-ludu-adda/</loc>
+    <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>

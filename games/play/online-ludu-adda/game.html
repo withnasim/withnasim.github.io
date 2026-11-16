@@ -1390,7 +1390,8 @@ function winner(color){
 function onTokenClick(color, idx){
   if (state.turn !== color || !state.rolled || state.busy) return;
   if (NET.active){
-    if (color === 'red' && legal(state.tokens[color][idx], state.dice)) NET.send({ t:'move', i: idx });
+    const meCol = NET.myColor || 'red';
+    if (color === meCol && legal(state.tokens[color][idx], state.dice)) NET.send({ t:'move', i: idx });
     return;
   }
   if (NET.active ? color !== (NET.myColor || 'red') : color !== 'red') return;

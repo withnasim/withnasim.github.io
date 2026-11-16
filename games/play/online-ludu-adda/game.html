@@ -542,6 +542,7 @@ body.snake .grid{display:none}
     <div class="pill">
       <span class="live"><s></s>লাইভ</span>
       <span>রুম</span><b id="pillCode">—</b>
+      <i id="liveDot" title="সংযোগ" style="width:8px;height:8px;border-radius:50%;background:#8b8b8b;display:inline-block;margin-left:2px"></i>
       <button class="cbtn" id="copyBtn">লিংক কপি</button>
     </div>
   </div>
@@ -1444,7 +1445,15 @@ function onTokenClick(color, idx){
   if (state.turn !== color || !state.rolled || state.busy) return;
   if (NET.active){
     const meCol = NET.myColor || 'red';
-    if (color === meCol && legal(state.tokens[color][idx], state.dice)) NET.send({ t:'move', i: idx });
+    if (color === meCol && legal(state.tokens[color][idx], state.dice)){
+      const before = state.tokens[color][idx].pos;
+      NET.send({ t:'move', i: idx });
+      setTimeout(() => {
+        if (NET.active && state.tokens[color][idx] && state.tokens[color][idx].pos === before){
+          NET.send({ t:'move', i: idx });          // send it once more
+        }
+      }, 1200);
+    }
     return;
   }
   if (NET.active ? color !== (NET.myColor || 'red') : color !== 'red') return;
@@ -1454,7 +1463,7 @@ function onTokenClick(color, idx){
 }
 
 document.getElementById('rollBtn').addEventListener('click', ()=>{
-  if (NET.active){ NET.send({t:'roll'}); return; }
+  if (NET.active){ NET.send({t:'roll'}); expectAnswer('roll'); return; }
   state.mode==='snake' ? sRoll() : roll();
 });
 
@@ -1499,6 +1508,7 @@ function roomLink(){
 function paintRoomCode(){
   const c = roomCodeNow();
   const a = document.getElementById('pillCode'); if (a) a.textContent = c;
+  paintLiveDot();
   const b = document.getElementById('lobbyCode'); if (b) b.textContent = c;
 }
 function copyRoomLink(){
@@ -2276,6 +2286,26 @@ function showLobby(){
   fitToWidth();
 }
 
+
+/* the server may ignore us when our socket went stale (tunnel hiccup, old tab).
+   If nothing comes back, nudge it once and then rebuild the connection. */
+function expectAnswer(kind){
+  clearTimeout(NET.answerTimer);
+  NET.answerTimer = setTimeout(() => {
+    if (!NET.active) return;
+    if (kind === 'roll' && state.rolled) return;
+    NET.retryCount = (NET.retryCount || 0) + 1;
+    if (NET.retryCount <= 1){
+      netStatus('সার্ভার সাড়া দিচ্ছে না — আবার পাঠাচ্ছি', true);
+      NET.send(kind === 'roll' ? { t:'roll' } : { t:'join', room: NET.code, name: NET.name, cid: clientId(), mode: state.mode });
+    } else {
+      netStatus('সংযোগ নতুন করে তৈরি হচ্ছে…', true);
+      try { NET.ws.close(); } catch(e){}
+      NET.retryCount = 0;
+    }
+  }, 1800);
+}
+
 let netRetries = 0;
 function netReconnect(){
   if (NET.reconnectTimer) return;
@@ -2321,7 +2351,7 @@ async function netConnect(room, name, cb){
   NET.ws.onmessage = ev => {
     let m; try { m = JSON.parse(ev.data); } catch(e){ return; }
     if (m.t === 'pong'){ NET.lastPong = Date.now(); }
-    else if (m.t === 'state') netApply(m.room);
+    else if (m.t === 'state'){ NET.retryCount = 0; clearTimeout(NET.answerTimer); netApply(m.room); }
     else if (m.t === 'you'){
       NET.myColor = m.color; NET.name = m.name; MY_COLOR = m.color;
       try { applyViewRotation(); } catch(e) {}

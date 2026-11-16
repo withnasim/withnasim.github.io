@@ -1505,6 +1505,21 @@ function roomLink(){
     ? origin2 + '/r/?room=' + code
     : origin2 + location.pathname + '?room=' + code;
 }
+
+function paintLiveDot(){
+  const d = document.getElementById('liveDot');
+  if (!d) return;
+  let ok = false, seated = true;
+  try {
+    ok = !!(NET.active && NET.ws && NET.ws.readyState === 1);
+    seated = !NET.active || (state.seats || []).includes(NET.myColor);
+  } catch(e) { return; }
+  d.style.background = !ok ? '#b3261e' : (seated ? '#2fa86a' : '#e8a33d');
+  d.title = !ok ? 'সার্ভারে যুক্ত নয়' : (seated ? 'যুক্ত · সিট ঠিক আছে' : 'যুক্ত, কিন্তু সিট পাওয়া যায়নি');
+}
+
+setInterval(function(){ try { paintLiveDot(); } catch(e){} }, 3000);
+
 function paintRoomCode(){
   const c = roomCodeNow();
   const a = document.getElementById('pillCode'); if (a) a.textContent = c;

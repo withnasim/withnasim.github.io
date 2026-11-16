@@ -668,6 +668,7 @@ body.snake .grid{display:none}
         <button class="rx" data-e="angry"><svg viewBox="0 0 32 32" width="22" height="22"><defs><linearGradient id="fr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a7a"/><stop offset="1" stop-color="#e03131"/></linearGradient></defs><circle cx="16" cy="16" r="13" fill="url(#fr)" stroke="#b02525" stroke-width="1.2"/><path d="M8.6 11.4l4.6 1.6M23.4 11.4l-4.6 1.6" stroke="#6b0f0f" stroke-width="2.2" stroke-linecap="round"/><circle cx="11.4" cy="15.4" r="1.8" fill="#6b0f0f"/><circle cx="20.6" cy="15.4" r="1.8" fill="#6b0f0f"/><path d="M10.6 24.2q5.4-4.6 10.8 0" stroke="#6b0f0f" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></button>
         <button class="rx" data-e="tea"><svg viewBox="0 0 32 32" width="22" height="22"><defs><linearGradient id="cp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d9a8"/><stop offset="1" stop-color="#c99b45"/></linearGradient></defs><path d="M6 13h16v6.4a7 7 0 0 1-7 7h-2a7 7 0 0 1-7-7z" fill="url(#cp)" stroke="#a3792c" stroke-width="1.2"/><path d="M22 15.2h2.2a3.2 3.2 0 0 1 0 6.4H22" stroke="#a3792c" stroke-width="2" fill="none"/><path d="M11 10.6c1.6-1.4-1-2.6 0-4.2M16 10.6c1.6-1.4-1-2.6 0-4.2" stroke="#b8a58c" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
       </div>
+      <button class="mic" id="spk" title="স্পিকার টেস্ট"><span style="font-size:15px">🔊</span><span class="mlabel">টেস্ট</span></button>
       <button class="mic" id="mic"><svg class="mi" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.2"/></svg><span class="mlabel">মাইক</span></button>
     </div>
   </div>
@@ -1514,7 +1515,10 @@ function remoteAudio(color){
   let a = RTC.audios[color];
   if (!a){
     a = document.createElement('audio');
-    a.autoplay = true; a.playsInline = true;
+    a.autoplay = true; a.playsInline = true; a.volume = 1;
+    if (a.setSinkId){
+      a.setSinkId('').catch(()=>{});   // default output, not the earpiece
+    }
     a.id = 'va_' + color;
     document.body.appendChild(a);
     RTC.audios[color] = a;
@@ -1602,7 +1606,13 @@ async function voiceStart(){
   }
   otherColors().forEach(c => connectPeer(c, true));
   RTC.on = true;
-  try { const a = audio(); if (a && a.ctx.state !== 'running') a.ctx.resume(); } catch(e){}
+  try {
+    const a = audio();
+    if (a){
+      if (a.ctx.state !== 'running') a.ctx.resume();
+      if (!(a.master.gain.value > 0.1)) a.master.gain.value = 0.85;
+    }
+  } catch(e){}
   // a late or crossed offer can leave a peer idle: nudge it a few times
   clearInterval(RTC.retry);
   let tries = 0;
@@ -1639,6 +1649,19 @@ function voiceMute(muted){
 function voiceStop(){
   voiceMute(true);
 }
+
+const spk = document.getElementById('spk');
+if (spk) spk.addEventListener('click', ()=>{
+  const a = audio();
+  if (!a){ showToast('এই ব্রাউজারে অডিও চলে না'); return; }
+  try { a.ctx.resume(); } catch(e){}
+  a.master.gain.value = 0.9;
+  const b = a.ctx.currentTime;
+  tone({type:'square', f:660, dur:.18, g:.3, at:b});
+  tone({type:'square', f:880, dur:.18, g:.3, at:b+.2});
+  tone({type:'square', f:1100, dur:.3, g:.3, at:b+.4});
+  showToast('স্পিকার টেস্ট · ' + a.ctx.state + ' · ভলিউম ' + Math.round(a.master.gain.value*100) + '%');
+});
 
 const mic = document.getElementById('mic');
 let micBusy = false;

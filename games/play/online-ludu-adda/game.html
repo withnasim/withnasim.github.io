@@ -900,7 +900,11 @@ function rollValue(){ return 1 + Math.floor(Math.random()*6); }
 /* ---------- audio engine (synthesised, no files) ---------- */
 let A = null;
 function audio(){
-  if (A) return A;
+  if (A){
+    // a suspended context is silent: resume it on every touch/roll, not just at creation
+    if (A.ctx.state !== 'running' && A.ctx.resume){ try { A.ctx.resume(); } catch(e){} }
+    return A;
+  }
   let ctx;
   try{ ctx = window.__forceCtx || new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
   if (!ctx) return null;
@@ -1140,6 +1144,16 @@ const sfx = {
     else { tone({type:'sine', at:b, f:520, f2:330, dur:.14, g:.12}); }
   }
 };
+
+
+/* phones suspend the audio context (autoplay rules, mic start, tab switch).
+   Every gesture and every sound call tries to wake it again. */
+['pointerdown','touchstart','click','keydown'].forEach(ev=>{
+  document.addEventListener(ev, ()=>{ if (A && A.ctx.state !== 'running'){ try { A.ctx.resume(); } catch(e){} } }, {passive:true});
+});
+document.addEventListener('visibilitychange', ()=>{
+  if (!document.hidden && A && A.ctx.state !== 'running'){ try { A.ctx.resume(); } catch(e){} }
+});
 
 /* ---------- game logic ---------- */
 function msg(html){ document.getElementById('status').innerHTML = html; }
@@ -1575,6 +1589,7 @@ async function voiceStart(){
   }
   otherColors().forEach(c => connectPeer(c, true));
   RTC.on = true;
+  try { const a = audio(); if (a && a.ctx.state !== 'running') a.ctx.resume(); } catch(e){}
   // a late or crossed offer can leave a peer idle: nudge it a few times
   clearInterval(RTC.retry);
   let tries = 0;

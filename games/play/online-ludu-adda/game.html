@@ -501,9 +501,35 @@ body.snake .grid{display:none}
   .stage{grid-template-columns:1fr}
   .pcard{display:none}
 }
+
+/* app-style splash, the way a mobile game opens */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(120% 80% at 50% 0%,#2a1b52 0%,#140e28 60%,#0c0819 100%);color:#fff;
+  transition:opacity .45s ease, visibility .45s ease}
+#splash.gone{opacity:0;visibility:hidden}
+#splash .lg{font-size:clamp(26px,8vw,40px);font-weight:800;letter-spacing:.5px;
+  background:linear-gradient(120deg,#ffd166,#f26b6b 45%,#7aa9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#splash .sb{font-size:12.5px;color:#cfc6ff;opacity:.9}
+#splash .ld{width:150px;height:5px;border-radius:9px;background:rgba(255,255,255,.16);overflow:hidden}
+#splash .ld i{display:block;height:100%;width:40%;border-radius:9px;background:linear-gradient(90deg,#ffd166,#f26b6b);
+  animation:spload 1s ease-in-out infinite}
+@keyframes spload{0%{margin-left:-40%}100%{margin-left:100%}}
+#splash .dc{width:44px;height:44px;border-radius:12px;background:#fff8ef;position:relative;transform:rotate(-8deg);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+#splash .dc b{position:absolute;width:7px;height:7px;border-radius:50%;background:#241636}
+#splash .dc b:nth-child(1){left:11px;top:11px}
+#splash .dc b:nth-child(2){left:50%;top:50%;transform:translate(-50%,-50%)}
+#splash .dc b:nth-child(3){right:11px;bottom:11px}
 </style>
 </head>
 <body>
+
+<div id="splash">
+  <div class="dc"><b></b><b></b><b></b></div>
+  <div class="lg">Online Ludu Adda</div>
+  <div class="sb">বন্ধুর সাথে লুডু · সাপলুডু · ভয়েস আড্ডা</div>
+  <div class="ld"><i></i></div>
+</div>
+
 <div class="app" id="app">
   <div class="topbar">
     <div class="brand">
@@ -2250,7 +2276,20 @@ function showLobby(){
   fitToWidth();
 }
 
+let netRetries = 0;
+function netReconnect(){
+  if (NET.reconnectTimer) return;
+  netRetries = Math.min(netRetries + 1, 6);
+  const wait = Math.min(1000 * netRetries, 6000);
+  NET.reconnectTimer = setTimeout(() => {
+    NET.reconnectTimer = null;
+    if (NET.active) return;
+    netConnect(NET.code, NET.name, null);
+  }, wait);
+}
+
 async function netConnect(room, name, cb){
+  netRetries = 0;
   if (NET.ws && NET.ws.readyState === 1){
     NET.send({ t:'join', room, name, cid: clientId(), mode: state.mode });
     if (cb) cb();
@@ -2264,12 +2303,25 @@ async function netConnect(room, name, cb){
   NET.ws.onopen = () => {
     NET.active = true;
     netStatus('সার্ভারে যুক্ত হয়েছে', false);
-    NET.send({ t:'join', room, name, mode: state.mode });
+    NET.send({ t:'join', room, name, cid: clientId(), mode: state.mode });
     if (cb) cb();
+    // a tunnel can freeze without closing the socket: keep it honest
+    clearInterval(NET.hb);
+    NET.lastPong = Date.now();
+    NET.hb = setInterval(() => {
+      if (!NET.ws || NET.ws.readyState !== 1) return;
+      if (Date.now() - (NET.lastPong || 0) > 32000){
+        try { NET.ws.close(); } catch(e){}
+        NET.lastPong = Date.now();
+        return;
+      }
+      NET.send({ t:'ping' });
+    }, 15000);
   };
   NET.ws.onmessage = ev => {
     let m; try { m = JSON.parse(ev.data); } catch(e){ return; }
-    if (m.t === 'state') netApply(m.room);
+    if (m.t === 'pong'){ NET.lastPong = Date.now(); }
+    else if (m.t === 'state') netApply(m.room);
     else if (m.t === 'you'){
       NET.myColor = m.color; NET.name = m.name; MY_COLOR = m.color;
       try { applyViewRotation(); } catch(e) {}
@@ -2282,8 +2334,17 @@ async function netConnect(room, name, cb){
     else if (m.t === 'react'){ floatSVG('', 50); sfx.react(m.k); }
     else if (m.t === 'err'){ showToast(m.msg || 'রুমে ঢোকা যায়নি'); }
   };
-  NET.ws.onclose = () => { NET.active = false; netStatus('সার্ভার সংযোগ বিচ্ছিন্ন — রিফ্রেশ করুন', true); };
-  NET.ws.onerror = () => { NET.active = false; netStatus('সার্ভারে যুক্ত হওয়া গেল না — রিফ্রেশ করুন', true); };
+  NET.ws.onclose = () => {
+    NET.active = false;
+    clearInterval(NET.hb);
+    if (NET.code && NET.name){
+      netStatus('সংযোগ বিচ্ছিন্ন — আবার যুক্ত হচ্ছি…', true);
+      netReconnect();
+    } else {
+      netStatus('সার্ভার সংযোগ বিচ্ছিন্ন — রিফ্রেশ করুন', true);
+    }
+  };
+  NET.ws.onerror = () => { NET.active = false; netStatus('সার্ভারে যুক্ত হওয়া গেল না', true); };
 }
 
 NET.send = obj => { try { if (NET.ws && NET.ws.readyState === 1) NET.ws.send(JSON.stringify(obj)); } catch(e){} };
@@ -2396,6 +2457,13 @@ msg(`<b>স্বাগতম</b> — খেলা বেছে নিন`);
   document.getElementById('joinModal').classList.add('show');
   setTimeout(()=>document.getElementById('joinName').focus(), 300);
 })();
+</script>
+<script>
+/* the splash hides as soon as the game is ready, so it feels like an app opening */
+setTimeout(()=>{
+  const s = document.getElementById('splash');
+  if (s) { s.classList.add('gone'); setTimeout(()=>{ try{ s.remove(); }catch(e){} }, 600); }
+}, 900);
 </script>
 </body>
 </html>

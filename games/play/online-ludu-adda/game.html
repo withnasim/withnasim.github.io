@@ -1458,17 +1458,151 @@ document.getElementById('copyBtn2').addEventListener('click', copyRoomLink);
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{ copyRoomLink(); });
 
+
+/* ---------------- real voice chat (WebRTC, signalled through our room server) ---------------- */
+const RTC = { on:false, stream:null, peers:{}, audios:{} };
+
+const RTC_ICE = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]
+};
+
+function rtcSend(kind, data){
+  if (!NET.active || !NET.ws || NET.ws.readyState !== 1) return;
+  try { NET.ws.send(JSON.stringify({ t:'rtc', kind, data })); } catch(e){}
+}
+
+function otherColors(){
+  return (state.seats || []).filter(c => c !== NET.myColor);
+}
+
+function nameOf(color){
+  return (typeof NAMES !== 'undefined' && NAMES[color]) || color;
+}
+
+function remoteAudio(color){
+  let a = RTC.audios[color];
+  if (!a){
+    a = document.createElement('audio');
+    a.autoplay = true; a.playsInline = true;
+    a.id = 'va_' + color;
+    document.body.appendChild(a);
+    RTC.audios[color] = a;
+  }
+  return a;
+}
+
+function connectPeer(color, initiate){
+  if (!RTC.stream) return null;
+  if (RTC.peers[color]) return RTC.peers[color];
+  let pc;
+  try { pc = new RTCPeerConnection(RTC_ICE); } catch(e){ return null; }
+  RTC.peers[color] = pc;
+  RTC.stream.getTracks().forEach(t => pc.addTrack(t, RTC.stream));
+
+  pc.onicecandidate = e => { if (e.candidate) rtcSend('ice', e.candidate); };
+  pc.ontrack = e => {
+    const a = remoteAudio(color);
+    a.srcObject = e.streams[0];
+    a.play().catch(()=>{});
+  };
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === 'connected') showToast(nameOf(color) + ' এর সাথে ভয়েস যুক্ত হয়েছে');
+    if (pc.connectionState === 'failed'){ try { pc.restartIce(); } catch(e){} }
+  };
+  if (initiate){
+    (async () => {
+      try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        rtcSend('offer', offer);
+      } catch(e){}
+    })();
+  }
+  return pc;
+}
+
+async function onRTC(m){
+  if (!RTC.stream) return;
+  const pc = RTC.peers[m.from];
+  try {
+    if (m.kind === 'offer'){
+      const p = pc || connectPeer(m.from, false);
+      if (!p) return;
+      await p.setRemoteDescription(m.data);
+      const ans = await p.createAnswer();
+      await p.setLocalDescription(ans);
+      rtcSend('answer', ans);
+    } else if (m.kind === 'answer'){
+      if (pc) await pc.setRemoteDescription(m.data);
+    } else if (m.kind === 'ice'){
+      if (pc) await pc.addIceCandidate(m.data);
+    }
+  } catch(e){ /* a stale candidate is harmless */ }
+}
+
+async function voiceStart(){
+  if (!NET.active || !NET.myColor){
+    showToast('ভয়েস শুধু অনলাইন রুমে চলে — আগে রুম খুলুন');
+    return false;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    showToast('এই ব্রাউজারে ভয়েস চলে না');
+    return false;
+  }
+  if (RTC.stream){
+    RTC.stream.getAudioTracks().forEach(t => t.enabled = true);
+    return true;
+  }
+  try {
+    RTC.stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true },
+      video: false
+    });
+  } catch(e){
+    showToast('মাইকের অনুমতি দরকার — ব্রাউজারে Allow চাপুন');
+    return false;
+  }
+  const me = (state.seats || []).indexOf(NET.myColor);
+  otherColors().forEach(c => {
+    // only the earlier player opens the connection, so both sides never offer at once
+    connectPeer(c, (state.seats || []).indexOf(c) < me);
+  });
+  RTC.on = true;
+  return true;
+}
+
+function voiceMute(muted){
+  if (RTC.stream) RTC.stream.getAudioTracks().forEach(t => t.enabled = !muted);
+}
+
+function voiceStop(){
+  voiceMute(true);
+}
+
 const mic = document.getElementById('mic');
-mic.addEventListener('click', ()=>{
-  mic.classList.toggle('on');
-  const on = mic.classList.contains('on');
-  mic.querySelector('.mlabel').textContent = on ? 'মাইক' : 'মিউট';
-  showToast(on ? 'ভয়েস চালু — রাফি শুনতে পাচ্ছে' : 'মাইক মিউট করা হলো');
-  sfx.toggle(on);
-  document.getElementById('cardRed').querySelector('.tgl').innerHTML = on
-    ? '<span class="bars"><b></b><b></b><b></b><b></b></span>কথা বলছেন'
-    : '<span class="bars" style="opacity:.4"><b></b><b></b><b></b><b></b></span>মিউট';
+let micBusy = false;
+mic.addEventListener('click', async ()=>{
+  if (micBusy) return;
+  micBusy = true;
+  try {
+    if (!mic.classList.contains('on')){
+      const ok = await voiceStart();
+      if (!ok) return;
+      mic.classList.add('on');
+      mic.querySelector('.mlabel').textContent = 'মাইক চালু';
+      showToast('মাইক চালু — বন্ধুরা শুনতে পাচ্ছে');
+    } else {
+      voiceMute(true);
+      mic.classList.remove('on');
+      mic.querySelector('.mlabel').textContent = 'মিউট';
+      showToast('মাইক মিউট করা হলো');
+    }
+  } finally { micBusy = false; }
 });
+
 
 document.getElementById('againBtn').addEventListener('click', ()=>{
   win.classList.remove('show','cut','result');
@@ -2025,7 +2159,12 @@ async function netConnect(room, name, cb){
       NET.myColor = m.color; NET.name = m.name; MY_COLOR = m.color;
       try { applyViewRotation(); } catch(e) {}
       if (!document.body.classList.contains('playing')) renderLobby();
+      try { if (RTC.stream && NET.myColor){
+        const me = (state.seats||[]).indexOf(NET.myColor);
+        otherColors().forEach(c => { connectPeer(c, (state.seats||[]).indexOf(c) < me); });
+      } } catch(e){}
     }
+    else if (m.t === 'rtc'){ onRTC(m); }
     else if (m.t === 'react'){ floatSVG('', 50); sfx.react(m.k); }
     else if (m.t === 'err'){ showToast(m.msg || 'রুমে ঢোকা যায়নি'); }
   };

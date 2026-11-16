@@ -1994,6 +1994,8 @@ function showStage(){
 }
 function showLobby(){
   document.getElementById('home').style.display = 'none';
+  const jm = document.getElementById('joinModal');
+  if (jm) jm.classList.remove('show');   // the name box used to stay over the lobby
   document.getElementById('lobby').style.display = 'flex';
   document.body.classList.add('inlobby');
   fitToWidth();

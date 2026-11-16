@@ -242,7 +242,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (!f) return;
     var m=/[?&]v=([a-f0-9]+)/.exec(f.getAttribute('src')||'');
     var v=m?m[1]:'1';
-    f.src='game.html?v=02389694?v='+v+(location.search?('&'+location.search.slice(1)):'');
+    f.src='game.'+'html?v='+v+(location.search?('&'+location.search.slice(1)):'');
   }catch(e){}
 })();
 </script>

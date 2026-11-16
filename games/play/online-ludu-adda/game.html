@@ -1971,12 +1971,17 @@ function netStatus(text, bad){
   if (!bad) setTimeout(()=>{ if (el.textContent === text) el.style.display='none'; }, 2500);
 }
 
-function netUrl(){
+async function netUrl(){
   const q = new URLSearchParams(location.search);
   if (q.get('ws')) return q.get('ws');
   if (window.ADDA_WS) return window.ADDA_WS;
   const h = location.hostname;
   if (!h || h === 'localhost' || h === '127.0.0.1') return 'ws://127.0.0.1:8790';
+  // the server address lives in ws.json so it can be changed without a new build
+  try{
+    const r = await fetch('ws.json?t=' + Date.now(), { cache:'no-store' });
+    if (r.ok){ const j = await r.json(); if (j && j.url) return j.url; }
+  }catch(e){}
   return 'wss://adda-ludo-rooms.quilt-century.workers.dev';
 }
 
@@ -1994,13 +1999,13 @@ function showLobby(){
   fitToWidth();
 }
 
-function netConnect(room, name, cb){
+async function netConnect(room, name, cb){
   if (NET.ws && NET.ws.readyState === 1){
     NET.send({ t:'join', room, name, mode: state.mode });
     if (cb) cb();
     return;
   }
-  const base = netUrl().replace(/\/+$/, '');
+  const base = (await netUrl()).replace(/\/+$/, '');
   NET.url = base + '/room?room=' + encodeURIComponent(String(room || 'MAIN').toUpperCase());
   try { NET.ws = new WebSocket(NET.url); }
   catch(e){ showToast('সার্ভারে যুক্ত হওয়া গেল না'); return; }

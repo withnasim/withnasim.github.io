@@ -237,13 +237,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script>
 /* pass the invite query (?room=CODE) into the game frame */
 (function(){
-  try{
-    var f=document.querySelector('.ludu-frame');
-    if (!f) return;
-    var m=/[?&]v=([a-f0-9]+)/.exec(f.getAttribute('src')||'');
-    var v=m?m[1]:'1';
-    f.src='game.'+'html?v='+v+(location.search?('&'+location.search.slice(1)):'');
-  }catch(e){}
+  var f=document.querySelector('.ludu-frame');
+  if (!f) return;
+  var extra = location.search ? ('&' + location.search.slice(1)) : '';
+  function load(v){
+    f.src='game.'+'html?v='+v+extra;
+  }
+  /* version.txt is tiny and never cached, so a new build is picked up at once
+     even when this wrapper page itself came from the browser cache */
+  fetch('version.txt?t='+Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.text() : ''; })
+    .then(function(v){ load((v||'').trim() || Date.now()); })
+    .catch(function(){ load(Date.now()); });
 })();
 </script>
 <script>

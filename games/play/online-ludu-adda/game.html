@@ -856,7 +856,8 @@ function render(){
 
   const redDone = state.tokens.red.filter(t=>t.pos===59).length;
   [...document.getElementById('progRed').children].forEach((d,i)=>d.classList.toggle('f', i<redDone));
-  document.getElementById('cardRed').classList.toggle('on', state.phase==='play' && state.turn==='red');
+  const meCard = NET.active ? (NET.myColor || 'red') : 'red';
+  document.getElementById('cardRed').classList.toggle('on', state.phase==='play' && state.turn===meCard);
 
   const other = (state.phase==='play' && state.turn!=='red') ? state.turn
               : (state.seats.find(c=>c!=='red') || 'yellow');
@@ -870,9 +871,9 @@ function render(){
   const oDone = state.tokens[other].filter(t=>t.pos===59).length;
   [...document.getElementById('oppProg').children].forEach((d,i)=>d.classList.toggle('f', i<oDone));
 
-  document.getElementById('rollBtn').disabled = state.mode==='snake'
-    ? !(state.phase==='play' && state.turn==='red' && !state.busy && !state.rolled)
-    : !(state.phase==='play' && state.turn==='red' && !state.busy && !state.rolled);
+  const meCol = NET.active ? (NET.myColor || 'red') : 'red';
+  const myTurn = state.phase === 'play' && state.turn === meCol && !state.busy && !state.rolled;
+  document.getElementById('rollBtn').disabled = !myTurn;
 }
 
 /* ---------- dice ---------- */
@@ -1392,7 +1393,7 @@ function onTokenClick(color, idx){
     if (color === 'red' && legal(state.tokens[color][idx], state.dice)) NET.send({ t:'move', i: idx });
     return;
   }
-  if (color !== 'red') return;
+  if (NET.active ? color !== (NET.myColor || 'red') : color !== 'red') return;
   const t = state.tokens[color][idx];
   if (!legal(t, state.dice)) return;
   doMove(t);
@@ -1988,6 +1989,8 @@ function netApply(room){
 
   state.seats = room.seats.map(s => s.color);
   room.seats.forEach(s => { NAMES[s.color] = s.name; });
+  const mine = room.seats.find(s => s.name === NET.name);
+  if (mine){ NET.myColor = mine.color; MY_COLOR = mine.color; applyViewRotation(); }
 
   if (room.phase === 'play' || room.phase === 'done') showStage();
   else if (room.phase === 'lobby' && !document.body.classList.contains('playing')) renderLobby();
@@ -2009,7 +2012,7 @@ function netApply(room){
     render();
     // highlight legal moves for my own tokens
     clearHighlights();
-    if (state.turn === 'red' && state.rolled){ highlight(); }
+    if (state.turn === (NET.myColor || 'red') && state.rolled){ highlight(); }
   } else {
     if (room.spos) state.spos = room.spos;
     if (room.stats) Object.keys(room.stats).forEach(c => { state.sstats[c] = room.stats[c]; });

@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex,follow">
 <style>body{background:linear-gradient(180deg,#fdf8ef,#f1e7d6)}</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1030">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ludu Adda">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Adda Ludo — Premium Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2097,6 +2106,7 @@ document.getElementById('onlineBtn').addEventListener('click', function(){
 });
 document.getElementById('joinGo').addEventListener('click', ()=>{
   const v = document.getElementById('joinName').value.trim();
+  if (window.matchMedia('(max-width:760px)').matches) goFullscreen();   // feels like an app
   openJoin(v);
 });
 document.getElementById('joinName').addEventListener('keydown', e=>{
@@ -2236,7 +2246,7 @@ function showLobby(){
 
 async function netConnect(room, name, cb){
   if (NET.ws && NET.ws.readyState === 1){
-    NET.send({ t:'join', room, name, mode: state.mode });
+    NET.send({ t:'join', room, name, cid: clientId(), mode: state.mode });
     if (cb) cb();
     return;
   }
@@ -2329,10 +2339,33 @@ function netHost(name){
 }
 
 /* guest: joins from the invite link */
+
+function clientId(){
+  let v = null;
+  try { v = localStorage.getItem('adda-cid'); } catch(e){}
+  if (!v){
+    v = 'c' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+    try { localStorage.setItem('adda-cid', v); } catch(e){}
+  }
+  return v;
+}
+function savedName(){
+  try { return localStorage.getItem('adda-name') || ''; } catch(e){ return ''; }
+}
+function rememberName(n){
+  try { localStorage.setItem('adda-name', n); } catch(e){}
+}
+function goFullscreen(el){
+  const e = el || document.documentElement;
+  const fn = e.requestFullscreen || e.webkitRequestFullscreen || e.msRequestFullscreen;
+  if (fn){ try { fn.call(e); } catch(err){} }
+}
+
 function netJoin(name){
   const q = new URLSearchParams(location.search);
   const code = (q.get('room') || q.get('r') || '').toUpperCase();
   NET.name = name || 'বন্ধু';
+  rememberName(NET.name);
   netConnect(code || undefined, NET.name, () => showLobby());
 }
 
@@ -2346,10 +2379,16 @@ try{
 msg(`<b>স্বাগতম</b> — খেলা বেছে নিন`);
 (function handleInvite(){
   const q = new URLSearchParams(location.search);
-  if (q.has('join') || q.has('r') || q.has('room')){
-    document.getElementById('joinModal').classList.add('show');
-    setTimeout(()=>document.getElementById('joinName').focus(), 300);
+  if (!(q.has('join') || q.has('r') || q.has('room'))) return;
+  const known = savedName();
+  if (known){
+    // a reload is the same player coming back, not a new one
+    document.getElementById('joinName').value = known;
+    netJoin(known);
+    return;
   }
+  document.getElementById('joinModal').classList.add('show');
+  setTimeout(()=>document.getElementById('joinName').focus(), 300);
 })();
 </script>
 </body>

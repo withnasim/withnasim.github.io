@@ -1,0 +1,25 @@
+{
+ "name": "Online Ludu Adda",
+ "short_name": "Ludu Adda",
+ "description": "বন্ধুর সাথে লুডু আর সাপলুডু — এক লিংকে, ভয়েস আড্ডা সহ",
+ "start_url": "./?utm_source=homescreen",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#1a1030",
+ "theme_color": "#1a1030",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}

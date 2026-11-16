@@ -1526,12 +1526,20 @@ function remoteAudio(color){
   return a;
 }
 
+/* one side is impolite (it offers), the other is polite (it accepts and rolls back).
+   Both offering at once used to leave two "answers" and no connection. */
+function isImpolite(color){
+  const seats = state.seats || [];
+  return seats.indexOf(NET.myColor) < seats.indexOf(color);
+}
+
 function connectPeer(color, initiate){
   if (!RTC.stream) return null;
   if (RTC.peers[color]) return RTC.peers[color];
   let pc;
   try { pc = new RTCPeerConnection(RTC_ICE); } catch(e){ return null; }
   RTC.peers[color] = pc;
+  pc.__ice = [];
   RTC.stream.getTracks().forEach(t => pc.addTrack(t, RTC.stream));
 
   pc.onicecandidate = e => { if (e.candidate) rtcSend('ice', e.candidate); };
@@ -1546,40 +1554,56 @@ function connectPeer(color, initiate){
       markVoice(color, true);
     }
     if (pc.connectionState === 'failed' || pc.connectionState === 'closed') markVoice(color, false);
-    if (pc.connectionState === 'failed'){ try { pc.restartIce(); } catch(e){} }
   };
-  if (initiate){
-    (async () => {
-      try {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        rtcSend('offer', offer);
-      } catch(e){}
-    })();
-  }
+  if (initiate) offerTo(color);
   return pc;
+}
+
+async function offerTo(color){
+  const pc = RTC.peers[color];
+  if (!pc || !RTC.stream) return;
+  try {
+    if (pc.signalingState === 'have-local-offer') await pc.setLocalDescription({ type:'rollback' });
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    rtcSend('offer', offer);
+  } catch(e){}
 }
 
 async function onRTC(m){
   if (!RTC.stream){ (RTC.pending = RTC.pending || []).push(m); return; }
-  const pc = RTC.peers[m.from];
   try {
     if (m.kind === 'offer'){
-      const p = pc || connectPeer(m.from, false);
-      if (!p) return;
-      if (p.signalingState === 'have-local-offer'){
-        try { await p.setLocalDescription({ type: 'rollback' }); } catch(e){}
+      // the impolite peer keeps its own offer, the polite one gives way
+      if (isImpolite(m.from)){
+        const mine = RTC.peers[m.from];
+        if (mine && mine.signalingState === 'have-local-offer') return;
       }
-      await p.setRemoteDescription(m.data);
-      const ans = await p.createAnswer();
-      await p.setLocalDescription(ans);
+      const pc = RTC.peers[m.from] || connectPeer(m.from, false);
+      if (!pc) return;
+      if (pc.signalingState === 'have-local-offer'){
+        try { await pc.setLocalDescription({ type:'rollback' }); } catch(e){}
+      }
+      await pc.setRemoteDescription(m.data);
+      const ans = await pc.createAnswer();
+      await pc.setLocalDescription(ans);
       rtcSend('answer', ans);
+      if (pc.__ice && pc.__ice.length){ pc.__ice.splice(0).forEach(c => pc.addIceCandidate(c).catch(()=>{})); }
+
     } else if (m.kind === 'answer'){
-      if (pc) await pc.setRemoteDescription(m.data);
+      const pc = RTC.peers[m.from];
+      if (!pc) return;
+      if (pc.signalingState !== 'have-local-offer') return;   // ignore a stale answer
+      await pc.setRemoteDescription(m.data);
+      if (pc.__ice && pc.__ice.length){ pc.__ice.splice(0).forEach(c => pc.addIceCandidate(c).catch(()=>{})); }
+
     } else if (m.kind === 'ice'){
-      if (pc) await pc.addIceCandidate(m.data);
+      const pc = RTC.peers[m.from];
+      if (!pc) return;
+      if (!pc.remoteDescription){ pc.__ice.push(m.data); return; }   // hold until the SDP lands
+      await pc.addIceCandidate(m.data);
     }
-  } catch(e){ /* a stale candidate is harmless */ }
+  } catch(e){}
 }
 
 async function voiceStart(){
@@ -1604,7 +1628,7 @@ async function voiceStart(){
     showToast('মাইকের অনুমতি দরকার — ব্রাউজারে Allow চাপুন');
     return false;
   }
-  otherColors().forEach(c => connectPeer(c, true));
+  otherColors().forEach(c => connectPeer(c, isImpolite(c)));
   RTC.on = true;
   try {
     const a = audio();
@@ -1619,16 +1643,10 @@ async function voiceStart(){
   RTC.retry = setInterval(() => {
     tries++;
     otherColors().forEach(c => {
+      if (!isImpolite(c)) return;              // only the offering side retries
       const pc = RTC.peers[c];
       if (!pc || pc.connectionState === 'connected' || pc.connectionState === 'closed') return;
-      (async () => {
-        try {
-          if (pc.signalingState === 'have-local-offer') await pc.setLocalDescription({type:'rollback'});
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-          rtcSend('offer', offer);
-        } catch(e){}
-      })();
+      offerTo(c);
     });
     if (tries > 4) clearInterval(RTC.retry);
   }, 4000);
@@ -2241,7 +2259,7 @@ async function netConnect(room, name, cb){
       try { applyViewRotation(); } catch(e) {}
       if (!document.body.classList.contains('playing')) renderLobby();
       try { if (RTC.stream && NET.myColor){
-        otherColors().forEach(c => { if (!RTC.peers[c]) connectPeer(c, true); });
+        otherColors().forEach(c => { if (!RTC.peers[c]) connectPeer(c, isImpolite(c)); });
       } } catch(e){}
     }
     else if (m.t === 'rtc'){ onRTC(m); }

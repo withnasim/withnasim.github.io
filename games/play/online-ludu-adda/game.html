@@ -2000,6 +2000,11 @@ function netConnect(room, name, cb){
   NET.ws.onmessage = ev => {
     let m; try { m = JSON.parse(ev.data); } catch(e){ return; }
     if (m.t === 'state') netApply(m.room);
+    else if (m.t === 'you'){
+      NET.myColor = m.color; NET.name = m.name; MY_COLOR = m.color;
+      try { applyViewRotation(); } catch(e) {}
+      if (!document.body.classList.contains('playing')) renderLobby();
+    }
     else if (m.t === 'react'){ floatSVG('', 50); sfx.react(m.k); }
     else if (m.t === 'err'){ showToast(m.msg || 'রুমে ঢোকা যায়নি'); }
   };

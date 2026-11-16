@@ -1742,7 +1742,18 @@ function renderLobby(){
         return `<span class="spec"><i style="background:${bg}">${n[0]}</i>${n}</span>`;
       }).join('')
     : '<span class="none">এখনো কেউ আসেনি</span>';
-  document.getElementById('startBtn').disabled = state.seats.length < 2;
+  const btn = document.getElementById('startBtn');
+  const isHost = !NET.active || !state.hostColor || (NET.myColor || 'red') === state.hostColor;
+  if (!isHost){
+    btn.disabled = true;
+    btn.textContent = 'হোস্ট শুরু করবে';
+  } else if (state.seats.length < 2){
+    btn.disabled = true;
+    btn.textContent = 'আরও ১ জন দরকার';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'খেলা শুরু করুন';
+  }
 }
 
 function joinFriend(name){
@@ -2006,6 +2017,7 @@ function netApply(room){
 
   state.seats = room.seats.map(s => s.color);
   room.seats.forEach(s => { NAMES[s.color] = s.name; });
+  state.hostColor = room.host || (room.seats[0] && room.seats[0].color) || null;
   const mine = room.seats.find(s => s.name === NET.name);
   if (mine){ NET.myColor = mine.color; MY_COLOR = mine.color; applyViewRotation(); }
 

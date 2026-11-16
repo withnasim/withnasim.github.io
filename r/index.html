@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>Joining the room… — Online Ludu Adda</title>
+<style>
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#100C30;color:#fff;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;padding:24px}
+  .card{max-width:340px}
+  h1{font-size:19px;margin:0 0 6px}
+  p{font-size:13px;color:#b9b3d6;line-height:1.6;margin:0 0 16px}
+  a.btn{display:inline-block;padding:12px 22px;border-radius:999px;background:linear-gradient(160deg,#f8e3ab,#d9a944);
+    color:#20180a;font-weight:800;text-decoration:none;font-size:13px}
+  .code{font-weight:800;letter-spacing:2px;color:#f0d9a8}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Adda Ludo</h1>
+  <p>রুম <span class="code" id="code">—</span> — খেলায় নিয়ে যাচ্ছি…</p>
+  <p id="msg" style="display:none">লিংকটা অসম্পূর্ণ। কোডসহ আবার পাঠান।</p>
+  <a class="btn" id="go" href="/games/play/online-ludu-adda/">খেলায় যান</a>
+</div>
+<script>
+(function(){
+  var path = location.pathname.replace(/\/r\/?/, '').replace(/\/+$/, '');
+  var q = new URLSearchParams(location.search);
+  var code = (q.get('room') || q.get('r') || path || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  var base = '/games/play/online-ludu-adda/';
+  var codeEl = document.getElementById('code');
+  if (code) codeEl.textContent = code;
+  var target = code ? base + '?room=' + encodeURIComponent(code) : base;
+  document.getElementById('go').href = target;
+  if (code) setTimeout(function(){ location.replace(target); }, 400);
+  else { document.getElementById('msg').style.display = 'block'; }
+})();
+</script>
+</body>
+</html>

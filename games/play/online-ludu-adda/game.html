@@ -1149,7 +1149,10 @@ const sfx = {
 /* phones suspend the audio context (autoplay rules, mic start, tab switch).
    Every gesture and every sound call tries to wake it again. */
 ['pointerdown','touchstart','click','keydown'].forEach(ev=>{
-  document.addEventListener(ev, ()=>{ if (A && A.ctx.state !== 'running'){ try { A.ctx.resume(); } catch(e){} } }, {passive:true});
+  document.addEventListener(ev, ()=>{
+    if (A && A.ctx.state !== 'running'){ try { A.ctx.resume(); } catch(e){} }
+    if (typeof playRemotes === 'function') playRemotes();
+  }, {passive:true});
 });
 document.addEventListener('visibilitychange', ()=>{
   if (!document.hidden && A && A.ctx.state !== 'running'){ try { A.ctx.resume(); } catch(e){} }
@@ -1497,6 +1500,12 @@ function otherColors(){
   return (state.seats || []).filter(c => c !== NET.myColor);
 }
 
+function markVoice(color, on){
+  document.querySelectorAll('[data-vc="' + color + '"]').forEach(el => {
+    el.textContent = on ? '🎤' : '';
+  });
+}
+
 function nameOf(color){
   return (typeof NAMES !== 'undefined' && NAMES[color]) || color;
 }
@@ -1528,7 +1537,11 @@ function connectPeer(color, initiate){
     a.play().catch(()=>{});
   };
   pc.onconnectionstatechange = () => {
-    if (pc.connectionState === 'connected') showToast(nameOf(color) + ' এর সাথে ভয়েস যুক্ত হয়েছে');
+    if (pc.connectionState === 'connected'){
+      showToast(nameOf(color) + ' এর সাথে ভয়েস যুক্ত হয়েছে');
+      markVoice(color, true);
+    }
+    if (pc.connectionState === 'failed' || pc.connectionState === 'closed') markVoice(color, false);
     if (pc.connectionState === 'failed'){ try { pc.restartIce(); } catch(e){} }
   };
   if (initiate){
@@ -1613,6 +1626,10 @@ async function voiceStart(){
   const q = RTC.pending || []; RTC.pending = [];
   q.forEach(m => onRTC(m));
   return true;
+}
+
+function playRemotes(){
+  Object.values(RTC.audios).forEach(a => { if (a.paused) a.play().catch(()=>{}); });
 }
 
 function voiceMute(muted){

@@ -1743,11 +1743,7 @@ function renderLobby(){
       }).join('')
     : '<span class="none">এখনো কেউ আসেনি</span>';
   const btn = document.getElementById('startBtn');
-  const isHost = !NET.active || !state.hostColor || (NET.myColor || 'red') === state.hostColor;
-  if (!isHost){
-    btn.disabled = true;
-    btn.textContent = 'হোস্ট শুরু করবে';
-  } else if (state.seats.length < 2){
+  if (state.seats.length < 2){
     btn.disabled = true;
     btn.textContent = 'আরও ১ জন দরকার';
   } else {
@@ -1958,6 +1954,23 @@ if (typeof ResizeObserver === 'function'){
 /* ================= online play (WebSocket) ================= */
 const NET = { ws:null, active:false, url:null, code:null, name:null, won:false, lastDice:0 };
 
+
+function netStatus(text, bad){
+  let el = document.getElementById('netbar');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'netbar';
+    el.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:300;padding:8px 12px;border-radius:12px;'+
+      'font-size:11px;font-weight:700;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.25)';
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+  el.style.background = bad ? '#b3261e' : '#1b6b3a';
+  el.style.color = '#fff';
+  el.style.display = text ? 'block' : 'none';
+  if (!bad) setTimeout(()=>{ if (el.textContent === text) el.style.display='none'; }, 2500);
+}
+
 function netUrl(){
   const q = new URLSearchParams(location.search);
   if (q.get('ws')) return q.get('ws');
@@ -1994,6 +2007,7 @@ function netConnect(room, name, cb){
 
   NET.ws.onopen = () => {
     NET.active = true;
+    netStatus('সার্ভারে যুক্ত হয়েছে', false);
     NET.send({ t:'join', room, name, mode: state.mode });
     if (cb) cb();
   };
@@ -2008,8 +2022,8 @@ function netConnect(room, name, cb){
     else if (m.t === 'react'){ floatSVG('', 50); sfx.react(m.k); }
     else if (m.t === 'err'){ showToast(m.msg || 'রুমে ঢোকা যায়নি'); }
   };
-  NET.ws.onclose = () => { NET.active = false; };
-  NET.ws.onerror = () => { NET.active = false; showToast('সার্ভার সংযোগ ব্যর্থ'); };
+  NET.ws.onclose = () => { NET.active = false; netStatus('সার্ভার সংযোগ বিচ্ছিন্ন — রিফ্রেশ করুন', true); };
+  NET.ws.onerror = () => { NET.active = false; netStatus('সার্ভারে যুক্ত হওয়া গেল না — রিফ্রেশ করুন', true); };
 }
 
 NET.send = obj => { try { if (NET.ws && NET.ws.readyState === 1) NET.ws.send(JSON.stringify(obj)); } catch(e){} };

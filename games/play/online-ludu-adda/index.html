@@ -143,7 +143,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="ludu-holder">
-        <iframe class="ludu-frame" src="game.html" title="Online Ludu Adda game" loading="lazy"
+        <iframe class="ludu-frame" src="game.html?v=02389694" title="Online Ludu Adda game" loading="lazy"
                 allow="fullscreen; autoplay; clipboard-write"></iframe>
       </div>
       <div class="player-bar">
@@ -239,7 +239,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 (function(){
   try{
     var f=document.querySelector('.ludu-frame');
-    if (f && location.search) f.src = 'game.html' + location.search;
+    if (!f) return;
+    var m=/[?&]v=([a-f0-9]+)/.exec(f.getAttribute('src')||'');
+    var v=m?m[1]:'1';
+    f.src='game.html?v=02389694?v='+v+(location.search?('&'+location.search.slice(1)):'');
   }catch(e){}
 })();
 </script>

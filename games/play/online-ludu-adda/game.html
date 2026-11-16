@@ -506,7 +506,7 @@ body.snake .grid{display:none}
     </div>
     <div class="pill">
       <span class="live"><s></s>লাইভ</span>
-      <span>রুম</span><b>ADDA-7K2</b>
+      <span>রুম</span><b id="pillCode">—</b>
       <button class="cbtn" id="copyBtn">লিংক কপি</button>
     </div>
   </div>
@@ -570,7 +570,7 @@ body.snake .grid{display:none}
         <div class="lt">ওয়েটিং রুম</div>
         <div class="ls">লিংকটা বন্ধুদের পাঠান — যে আসবে সে সিট নেবে, বাড়তি হলে দর্শক</div>
       </div>
-      <div class="lroom">রুম <b>ADDA-7K2</b><button class="cbtn" id="copyBtn2">লিংক কপি</button></div>
+      <div class="lroom">রুম <b id="lobbyCode">—</b><button class="cbtn" id="copyBtn2">লিংক কপি</button></div>
     </div>
 
     <div class="modes">
@@ -1429,18 +1429,24 @@ function floatSVG(html, leftPct){
 const toast = document.getElementById('toast');
 function showToast(t){ toast.textContent=t; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1800); }
 
+function roomCodeNow(){ return NET.code || state.roomCode || 'ADDA-7K2'; }
+function roomLink(){
+  return location.origin + location.pathname + '?room=' + encodeURIComponent(roomCodeNow());
+}
+function paintRoomCode(){
+  const c = roomCodeNow();
+  const a = document.getElementById('pillCode'); if (a) a.textContent = c;
+  const b = document.getElementById('lobbyCode'); if (b) b.textContent = c;
+}
 function copyRoomLink(){
-  const link = 'https://ludo.najura.com/r/ADDA-7K2?join=1';
-  return navigator.clipboard.writeText(link).then(()=>showToast('লিংক কপি হয়েছে — বন্ধুকে পাঠান'))
-    .catch(()=>showToast('রুম কোড: ADDA-7K2'));
+  paintRoomCode();
+  return navigator.clipboard.writeText(roomLink())
+    .then(()=>showToast('লিংক কপি হয়েছে — বন্ধুকে পাঠান'))
+    .catch(()=>showToast('লিংক: ' + roomLink()));
 }
 document.getElementById('copyBtn2').addEventListener('click', copyRoomLink);
 
-document.getElementById('copyBtn').addEventListener('click', async ()=>{
-  const link = 'https://ludo.najura.com/r/ADDA-7K2?join=1';
-  try{ await navigator.clipboard.writeText(link); showToast('লিংক কপি হয়েছে — বন্ধুকে পাঠান'); }
-  catch(e){ showToast('রুম কোড: ADDA-7K2'); }
-});
+document.getElementById('copyBtn').addEventListener('click', ()=>{ copyRoomLink(); });
 
 const mic = document.getElementById('mic');
 mic.addEventListener('click', ()=>{
@@ -1984,7 +1990,7 @@ NET.send = obj => { try { if (NET.ws && NET.ws.readyState === 1) NET.ws.send(JSO
 
 function netApply(room){
   if (!room) return;
-  NET.code = room.code;
+  NET.code = room.code; paintRoomCode();
   state.mode = room.mode === 'snake' ? 'snake' : 'ludo';
   document.body.classList.toggle('snake', state.mode === 'snake');
 
@@ -2031,8 +2037,9 @@ function netHost(name){
   state.roomCode = code;
   NET.name = name || 'নাসিম';
   netConnect(code, NET.name, () => showLobby());
-  const link = location.origin + location.pathname + '?room=' + code;
-  try { navigator.clipboard.writeText(link); } catch(e){}
+  state.roomCode = code;
+  paintRoomCode();
+  try { navigator.clipboard.writeText(location.origin + location.pathname + '?room=' + code); } catch(e){}
   showToast('রুম তৈরি হয়েছে — লিংক কপি হয়েছে');
 }
 

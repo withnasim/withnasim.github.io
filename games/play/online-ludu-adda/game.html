@@ -2108,6 +2108,12 @@ document.getElementById('joinGo').addEventListener('click', ()=>{
   const v = document.getElementById('joinName').value.trim();
   if (window.matchMedia('(max-width:760px)').matches) goFullscreen();   // feels like an app
   openJoin(v);
+  // iPhone Safari cannot go fullscreen inside the tab; the installed app can
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const standalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (isIOS && !standalone){
+    setTimeout(()=>showToast('iPhone-এ অ্যাপের মতো চালাতে: Share → Add to Home Screen'), 1200);
+  }
 });
 document.getElementById('joinName').addEventListener('keydown', e=>{
   if (e.key === 'Enter') document.getElementById('joinGo').click();

@@ -1440,7 +1440,7 @@ function roomLink(){
   const onNajura = /najura\.com$/.test(new URL(origin2).hostname);
   const code = encodeURIComponent(roomCodeNow());
   return onNajura
-    ? origin2 + '/r/' + code
+    ? origin2 + '/r/?room=' + code
     : origin2 + location.pathname + '?room=' + code;
 }
 function paintRoomCode(){

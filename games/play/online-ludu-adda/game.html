@@ -1431,7 +1431,13 @@ function showToast(t){ toast.textContent=t; toast.classList.add('show'); setTime
 
 function roomCodeNow(){ return NET.code || state.roomCode || 'ADDA-7K2'; }
 function roomLink(){
-  return location.origin + location.pathname + '?room=' + encodeURIComponent(roomCodeNow());
+  // when the game runs inside the najura page, share the page URL, not the frame
+  let base = location.origin + location.pathname;
+  try{
+    const pl = window.parent.location;
+    if (pl && /\/online-ludu-adda\//.test(pl.pathname)) base = pl.origin + pl.pathname;
+  }catch(e){}
+  return base + '?room=' + encodeURIComponent(roomCodeNow());
 }
 function paintRoomCode(){
   const c = roomCodeNow();
@@ -2039,7 +2045,7 @@ function netHost(name){
   netConnect(code, NET.name, () => showLobby());
   state.roomCode = code;
   paintRoomCode();
-  try { navigator.clipboard.writeText(location.origin + location.pathname + '?room=' + code); } catch(e){}
+  try { navigator.clipboard.writeText(roomLink()); } catch(e){}
   showToast('রুম তৈরি হয়েছে — লিংক কপি হয়েছে');
 }
 

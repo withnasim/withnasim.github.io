@@ -1525,12 +1525,15 @@ function connectPeer(color, initiate){
 }
 
 async function onRTC(m){
-  if (!RTC.stream) return;
+  if (!RTC.stream){ (RTC.pending = RTC.pending || []).push(m); return; }
   const pc = RTC.peers[m.from];
   try {
     if (m.kind === 'offer'){
       const p = pc || connectPeer(m.from, false);
       if (!p) return;
+      if (p.signalingState === 'have-local-offer'){
+        try { await p.setLocalDescription({ type: 'rollback' }); } catch(e){}
+      }
       await p.setRemoteDescription(m.data);
       const ans = await p.createAnswer();
       await p.setLocalDescription(ans);
@@ -1565,12 +1568,11 @@ async function voiceStart(){
     showToast('মাইকের অনুমতি দরকার — ব্রাউজারে Allow চাপুন');
     return false;
   }
-  const me = (state.seats || []).indexOf(NET.myColor);
-  otherColors().forEach(c => {
-    // only the earlier player opens the connection, so both sides never offer at once
-    connectPeer(c, (state.seats || []).indexOf(c) < me);
-  });
+  otherColors().forEach(c => connectPeer(c, true));
   RTC.on = true;
+  // offers that arrived before the mic was ready
+  const q = RTC.pending || []; RTC.pending = [];
+  q.forEach(m => onRTC(m));
   return true;
 }
 
@@ -2160,8 +2162,7 @@ async function netConnect(room, name, cb){
       try { applyViewRotation(); } catch(e) {}
       if (!document.body.classList.contains('playing')) renderLobby();
       try { if (RTC.stream && NET.myColor){
-        const me = (state.seats||[]).indexOf(NET.myColor);
-        otherColors().forEach(c => { connectPeer(c, (state.seats||[]).indexOf(c) < me); });
+        otherColors().forEach(c => { if (!RTC.peers[c]) connectPeer(c, true); });
       } } catch(e){}
     }
     else if (m.t === 'rtc'){ onRTC(m); }

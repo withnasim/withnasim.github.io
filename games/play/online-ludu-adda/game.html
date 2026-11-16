@@ -1570,6 +1570,25 @@ async function voiceStart(){
   }
   otherColors().forEach(c => connectPeer(c, true));
   RTC.on = true;
+  // a late or crossed offer can leave a peer idle: nudge it a few times
+  clearInterval(RTC.retry);
+  let tries = 0;
+  RTC.retry = setInterval(() => {
+    tries++;
+    otherColors().forEach(c => {
+      const pc = RTC.peers[c];
+      if (!pc || pc.connectionState === 'connected' || pc.connectionState === 'closed') return;
+      (async () => {
+        try {
+          if (pc.signalingState === 'have-local-offer') await pc.setLocalDescription({type:'rollback'});
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          rtcSend('offer', offer);
+        } catch(e){}
+      })();
+    });
+    if (tries > 4) clearInterval(RTC.retry);
+  }, 4000);
   // offers that arrived before the mic was ready
   const q = RTC.pending || []; RTC.pending = [];
   q.forEach(m => onRTC(m));

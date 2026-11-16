@@ -235,6 +235,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </footer>
 <script>
+/* pass the invite query (?room=CODE) into the game frame */
+(function(){
+  try{
+    var f=document.querySelector('.ludu-frame');
+    if (f && location.search) f.src = 'game.html' + location.search;
+  }catch(e){}
+})();
+</script>
+<script>
 (function(){
   var b=document.getElementById('fsBtn');
   if(!b) return;
